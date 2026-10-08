@@ -9636,27 +9636,14 @@
 
     main_screen_tax_rate: {
       title: "Main-screen tax rate",
-      description: "Displays a nonzero tax rate alongside net income on the Main galaxy screen.",
-      remarks: "False preserves the classic income line. When enabled and tax is nonzero, main_screen_income_template supplies the text. Treasury balance, font fitting, and negative-income colors are unchanged. Local to each player, excluded from saves and synchronization.",
+      description: "Displays a nonzero tax percentage above the treasury balance on the Main galaxy screen.",
+      remarks: "False preserves the classic two-line treasury display. When enabled and tax is nonzero, a third line shows the percentage above BC and income, using the research percentage's base font settings and font-height spacing. Treasury balance, income formatting, and negative-value colors are unchanged. Local to each player, excluded from saves and synchronization.",
       examples: ["interface main_screen_tax_rate = true;"],
       group: "interface",
       namespace: "interface",
       type: "bool",
       default: false,
       bind_root: { header: "game/mainscr.h", symbol: "MAINSCR::main_screen_tax_rate" },
-    },
-
-    main_screen_income_template: {
-      title: "Main-screen taxed income template",
-      description: "Formats the Main galaxy screen income line when main_screen_tax_rate is enabled and tax is nonzero.",
-      remarks: "Uses the existing case-sensitive named-placeholder formatter: $SIGN$ is plus for nonnegative income or empty for negative income, $INCOME$ is the localized comma-formatted amount including any minus sign, $UNIT$ is the localized currency unit, and $TAX_RATE$ is the integer percentage without a percent sign. Unknown placeholders remain unchanged; $$ emits a literal dollar sign. Keep text short for the 67-pixel fitted line. Local to each player, excluded from saves and synchronization.",
-      examples: ["interface main_screen_income_template = \"$SIGN$$INCOME$ $UNIT$ ($TAX_RATE$%)\";"],
-      group: "interface",
-      namespace: "interface",
-      type: "string",
-      constraints: { max_length: 255 },
-      default: "$SIGN$$INCOME$ $UNIT$ ($TAX_RATE$%)",
-      bind_root: { header: "game/mainscr.h", symbol: "MAINSCR::main_screen_income_template" },
     },
 
     maximum_galaxy_zoom_mode: {

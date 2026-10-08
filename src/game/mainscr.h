@@ -32,7 +32,6 @@ namespace MAINSCR {
     extern uint32_t menlo_cheat_points;
     extern bool main_map_overview_markers;
     extern bool main_screen_tax_rate;
-    extern char main_screen_income_template[256];
     extern int8_t moving_a_stack;
     extern int8_t track_time_flag;
     extern uint8_t wormhole_link_color;
@@ -202,8 +201,6 @@ namespace MAINSCR {
      * Draws the resource, stardate, and research summary widgets on the main-screen HUD.
      */
     void __cdecl Print_Main_Screen_Data();
-
-    void Format_Main_Screen_Income(char* output, uint32_t output_size, int32_t income, const char* formatted_income, const char* monetary_unit, uint8_t tax_rate);
 
     /**
      * Draws the map layers that sit below movable-box stenciling.

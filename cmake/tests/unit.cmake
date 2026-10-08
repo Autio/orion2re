@@ -162,7 +162,9 @@ orion2re_add_unit_test(test_mainscr_reload
     PRODUCTION_SOURCES
         src/game/mainscr.cpp
         src/game/mainscr_main.cpp
-        src/game/strbuild.cpp
+    FAKE_SOURCES
+        tests/fakes/fake_main_screen_hud_runtime.cpp
+    LINK_SDL
 )
 
 if(MSVC)

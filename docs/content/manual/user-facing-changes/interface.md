@@ -81,9 +81,7 @@ Visible wormholes are connected by lines. `interface wormhole_link_color` change
 
 ### Main-screen Tax Rate
 
-Set `interface main_screen_tax_rate = true;` to include a nonzero tax rate on the Main galaxy screen's net-income line, for example `+120 BC (20%)`. The setting is disabled by default, and 0% tax always retains the classic income line. The treasury balance and negative-income colors are unchanged.
-
-`interface main_screen_income_template` customizes this line when the setting is enabled and tax is nonzero. Its default is `$SIGN$$INCOME$ $UNIT$ ($TAX_RATE$%)`. The case-sensitive placeholders supply the positive sign (or empty for negative income), localized formatted income, currency unit, and integer tax percentage respectively. Use short text to fit the existing sidebar. Both settings are local and excluded from saves and multiplayer synchronization.
+Set `interface main_screen_tax_rate = true;` to show a nonzero tax percentage as a third line above the treasury balance on the Main galaxy screen. The order is tax percentage, BC balance, then income. The percentage is centered and uses the same base font settings and font-height spacing as the technology breakthrough percentage. The setting is disabled by default, and 0% tax retains the classic two-line display. Treasury and income formatting and negative-value colors are unchanged. This setting is local and excluded from saves and multiplayer synchronization.
 
 
 ### Influence Overlay

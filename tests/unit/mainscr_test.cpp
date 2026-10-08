@@ -6,6 +6,7 @@
 #include "config/config_loader.h"
 #include "doctest/doctest.h"
 #include "game/mainscr.h"
+#include "fakes/fake_main_screen_hud_runtime.h"
 
 namespace {
     static_assert(std::size(MAINSCR::mouse_list_relocation) == 2);
@@ -61,46 +62,86 @@ namespace HAROLD {
     }
 } // namespace HAROLD
 
-DOCTEST_TEST_CASE("main-screen income optionally includes nonzero tax rates") {
+DOCTEST_TEST_CASE("main-screen tax percentage matches research font and line spacing") {
     const bool saved_setting = MAINSCR::main_screen_tax_rate;
-    const std::string saved_template = MAINSCR::main_screen_income_template;
-    snprintf(MAINSCR::main_screen_income_template,
-        sizeof(MAINSCR::main_screen_income_template),
-        "%s",
-        "$SIGN$$INCOME$ $UNIT$ ($TAX_RATE$%)");
-    char output[128];
-
-    MAINSCR::main_screen_tax_rate = false;
-    MAINSCR::Format_Main_Screen_Income(output, sizeof(output), 1200, "1,200", "BC", 20);
-    DOCTEST_CHECK(std::string(output) == "+1,200 BC");
-
     MAINSCR::main_screen_tax_rate = true;
-    MAINSCR::Format_Main_Screen_Income(output, sizeof(output), 1200, "1,200", "BC", 0);
-    DOCTEST_CHECK(std::string(output) == "+1,200 BC");
     for (uint8_t rate = 10; rate <= 50; rate += 10) {
-        MAINSCR::Format_Main_Screen_Income(output, sizeof(output), 1200, "1,200", "BC", rate);
-        DOCTEST_CHECK(std::string(output) == "+1,200 BC (" + std::to_string(rate) + "%)");
+        TEST_MAIN_SCREEN_HUD::Reset();
+        MOX::player[0].tax_rate = rate;
+        MAINSCR::Print_Main_Screen_Data();
+        const auto& draws = TEST_MAIN_SCREEN_HUD::draws;
+        DOCTEST_REQUIRE(draws.size() >= 4);
+        const auto& tax = draws[1];
+        const auto& balance = draws[2];
+        const auto& income = draws[3];
+        DOCTEST_CHECK(tax.text == std::to_string(rate) + "%");
+        DOCTEST_CHECK(balance.text == "500 BC");
+        DOCTEST_CHECK(income.text == "+120 BC");
+        DOCTEST_CHECK(tax.x == 579);
+        DOCTEST_CHECK(balance.x == tax.x);
+        DOCTEST_CHECK(income.x == tax.x);
+        DOCTEST_CHECK(tax.y == 84);
+        DOCTEST_CHECK(balance.y == 96);
+        DOCTEST_CHECK(income.y == 108);
+        DOCTEST_CHECK(balance.y - tax.y == income.y - balance.y);
+        for (const auto* draw : {&tax, &balance, &income}) {
+            DOCTEST_CHECK(draw->style == 2);
+            DOCTEST_CHECK(draw->spacing == 2);
+            DOCTEST_CHECK(draw->color == 14);
+        }
+        bool found_research_percentage = false;
+        for (const auto& draw : draws) {
+            if (draw.y == 379 && draw.text == "20%") {
+                found_research_percentage = true;
+                DOCTEST_CHECK(draw.x == tax.x);
+                DOCTEST_CHECK(draw.style == tax.style);
+                DOCTEST_CHECK(draw.spacing == tax.spacing);
+                DOCTEST_CHECK(draw.color == tax.color);
+            }
+        }
+        DOCTEST_CHECK(found_research_percentage);
+        for (const auto& fit : TEST_MAIN_SCREEN_HUD::fits) {
+            if (fit.text == tax.text || fit.text == balance.text || fit.text == income.text) {
+                DOCTEST_CHECK(fit.initial_style == 2);
+                DOCTEST_CHECK(fit.initial_spacing == 2);
+                DOCTEST_CHECK(fit.variant == 4);
+                DOCTEST_CHECK(fit.max_width == 67);
+                DOCTEST_CHECK(fit.min_style == 1);
+            }
+        }
     }
-    MAINSCR::Format_Main_Screen_Income(output, sizeof(output), -1200, "-1.200", "MC", 50);
-    DOCTEST_CHECK(std::string(output) == "-1.200 MC (50%)");
-    MAINSCR::Format_Main_Screen_Income(output, sizeof(output), 0, "0", "BC", 10);
-    DOCTEST_CHECK(std::string(output) == "+0 BC (10%)");
-
-    snprintf(MAINSCR::main_screen_income_template,
-        sizeof(MAINSCR::main_screen_income_template),
-        "%s",
-        "$TAX_RATE$%: $SIGN$$INCOME$ $UNIT$");
-    MAINSCR::Format_Main_Screen_Income(output, sizeof(output), 1200, "1,200", "BC", 20);
-    DOCTEST_CHECK(std::string(output) == "20%: +1,200 BC");
-    char short_output[5];
-    MAINSCR::Format_Main_Screen_Income(short_output, sizeof(short_output), 1200, "1,200", "BC", 20);
-    DOCTEST_CHECK(std::string(short_output) == "20%:");
-
     MAINSCR::main_screen_tax_rate = saved_setting;
-    snprintf(MAINSCR::main_screen_income_template,
-        sizeof(MAINSCR::main_screen_income_template),
-        "%s",
-        saved_template.c_str());
+}
+
+DOCTEST_TEST_CASE("main-screen hides tax when disabled or zero and preserves negative colors") {
+    const bool saved_setting = MAINSCR::main_screen_tax_rate;
+    for (bool enabled : {false, true}) {
+        for (uint8_t rate : {0, 20}) {
+            TEST_MAIN_SCREEN_HUD::Reset();
+            MAINSCR::main_screen_tax_rate = enabled;
+            MOX::player[0].tax_rate = rate;
+            MOX::player[0].bc = -500;
+            MOX::player[0].surplus_bc = -120;
+            MOX::settings.language = 1;
+            MAINSCR::Print_Main_Screen_Data();
+            const auto& draws = TEST_MAIN_SCREEN_HUD::draws;
+            const bool shows_tax = enabled && rate != 0;
+            DOCTEST_REQUIRE(draws.size() >= 4);
+            if (shows_tax) {
+                DOCTEST_CHECK(draws[1].text == "20%");
+                DOCTEST_CHECK(draws[1].color == 14);
+            }
+            const auto& balance = draws[shows_tax ? 2 : 1];
+            const auto& income = draws[shows_tax ? 3 : 2];
+            DOCTEST_CHECK(balance.text == "-500 MC");
+            DOCTEST_CHECK(income.text == "-120 MC");
+            DOCTEST_CHECK(balance.y == 96);
+            DOCTEST_CHECK(income.y == 108);
+            DOCTEST_CHECK(balance.color == 75);
+            DOCTEST_CHECK(income.color == 75);
+        }
+    }
+    MAINSCR::main_screen_tax_rate = saved_setting;
 }
 
 DOCTEST_TEST_CASE("main-screen relocation mode uses the restored destination cursor") {

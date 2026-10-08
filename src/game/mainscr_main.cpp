@@ -1,24 +1,6 @@
 #include "pch.h"
 
-#include "strbuild.h"
-
 namespace MAINSCR {
-    void Format_Main_Screen_Income(char* output, uint32_t output_size, int32_t income, const char* formatted_income, const char* monetary_unit, uint8_t tax_rate) {
-        const char* sign = income < 0 ? "" : "+";
-        if (!main_screen_tax_rate || tax_rate == 0) {
-            snprintf(output, output_size, "%s%s %s", sign, formatted_income, monetary_unit);
-            return;
-        }
-
-        const STRBUILD::s_named_argument arguments[] = {
-            STRBUILD::Named_Argument("SIGN", sign),
-            STRBUILD::Named_Argument("INCOME", formatted_income),
-            STRBUILD::Named_Argument("UNIT", monetary_unit),
-            STRBUILD::Named_Argument("TAX_RATE", (uint16_t)tax_rate),
-        };
-        STRBUILD::Named_Snprintf(output, output_size, main_screen_income_template, arguments, (uint32_t)std::size(arguments));
-    }
-
     /**
      * Draws the main-screen HUD summaries for stardate, economy, command points, food, freighters, and research.
      */
@@ -83,8 +65,17 @@ namespace MAINSCR {
         HAROLD::Get_Monetary_Unit_String(monetary_unit);
         s_player* plr = &MOX::player[MOX::PLAYER_NUM];
 
+        if (main_screen_tax_rate && plr->tax_rate != 0) {
+            snprintf(buffer, sizeof(buffer), "%d%%", (int)plr->tax_rate);
+            MISC::Set_Fitted_Font_Style(buffer, &colors2, 2, 2, 4, 0x43, 1);
+            Set_Post_Fitted_Font_Style(14, 23);
+            fonts::Set_Outline_Color(2, 1);
+            fonts::Print_Centered(579, (int16_t)(96 - fonts::Get_Font_Height()), buffer);
+        }
+
         char* surplus_bc_comma = MISC::Get_Comma_String(plr->surplus_bc);
-        Format_Main_Screen_Income(buffer, sizeof(buffer), plr->surplus_bc, surplus_bc_comma, monetary_unit, plr->tax_rate);
+        const char* bc_sign = (plr->surplus_bc < 0) ? "" : "+";
+        snprintf(buffer, sizeof(buffer), "%s%s %s", bc_sign, surplus_bc_comma, monetary_unit);
         MISC::Set_Fitted_Font_Style(buffer, &colors2, 2, 2, 4, 0x43, 1);
         int16_t bc_style = MISC::Get_Font_Style();
         MISC::Get_Font_Spacing();
@@ -106,7 +97,8 @@ namespace MAINSCR {
         fonts::Print_Centered(579, 96, buffer);
 
         surplus_bc_comma = MISC::Get_Comma_String(plr->surplus_bc);
-        Format_Main_Screen_Income(buffer, sizeof(buffer), plr->surplus_bc, surplus_bc_comma, monetary_unit, plr->tax_rate);
+        bc_sign = (plr->surplus_bc < 0) ? "" : "+";
+        snprintf(buffer, sizeof(buffer), "%s%s %s", bc_sign, surplus_bc_comma, monetary_unit);
         MISC::Set_Fitted_Font_Style(buffer, &colors2, 2, 2, 4, 0x43, 1);
         bc_style = MISC::Get_Font_Style();
         int16_t bc_spacing = MISC::Get_Font_Spacing();

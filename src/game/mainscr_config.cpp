@@ -5,5 +5,4 @@ namespace MAINSCR {
     uint32_t menlo_cheat_points = 1000000;
     bool main_map_overview_markers = false;
     bool main_screen_tax_rate = false;
-    char main_screen_income_template[256] = "$SIGN$$INCOME$ $UNIT$ ($TAX_RATE$%)";
 }
