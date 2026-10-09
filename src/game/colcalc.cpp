@@ -1357,6 +1357,12 @@ namespace COLCALC {
     }
 
     int __cdecl Size_And_Climate_Max_Population(int8_t size, int climate, uint8_t is_immune) {
+        if (population_capacity_table_enabled) {
+            return is_immune != 0
+                ? population_capacity_table_tolerant[climate][size]
+                : population_capacity_table[climate][size];
+        }
+
         // Calculate population factor based on size and climate
         int32_t population_factor =
             (int32_t)is_immune * population_bonus.tolerant +

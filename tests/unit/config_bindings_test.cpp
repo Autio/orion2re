@@ -3426,6 +3426,81 @@ DOCTEST_TEST_CASE("population capacity preserves classic defaults and binds by s
         "colony population_capacity climate gaia = 256;", &writes, &diagnostic));
 }
 
+DOCTEST_TEST_CASE("population table configuration binds independently and is saved and synchronized") {
+    config::s_config_state state;
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+    DOCTEST_CHECK_FALSE(COLCALC::population_capacity_table_enabled);
+    DOCTEST_CHECK(COLCALC::population_capacity_table
+                      [PLANET_CLIMATE_TOXIC][PLANET_SIZE_SMALL] == 3);
+    DOCTEST_CHECK(COLCALC::population_capacity_table_tolerant
+                      [PLANET_CLIMATE_TOXIC][PLANET_SIZE_SMALL] == 5);
+
+    config::s_config_write_set writes;
+    config::s_cfg_diagnostic diagnostic;
+    DOCTEST_REQUIRE(Append_Decoded_(
+        "colony population_capacity_table_enabled = true;"
+        "colony population_capacity_table gaia = 0 127 128 255 30;"
+        "colony population_capacity_table terran medium = 17;"
+        "colony population_capacity_table_tolerant toxic small = 19;"
+        "colony population_capacity size huge = 40;"
+        "colony population_capacity climate toxic = 35;"
+        "colony pop_bonus tolerant = 50;",
+        &writes,
+        &diagnostic));
+    DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+    DOCTEST_CHECK(COLCALC::population_capacity_table_enabled);
+    const uint8_t expected[PLANET_SIZE_COUNT] = {0, 127, 128, 255, 30};
+    DOCTEST_CHECK(std::memcmp(COLCALC::population_capacity_table
+                                  [PLANET_CLIMATE_GAIA],
+                      expected,
+                      sizeof(expected)) == 0);
+    DOCTEST_CHECK(COLCALC::population_capacity_table
+                      [PLANET_CLIMATE_TERRAN][PLANET_SIZE_MEDIUM] == 17);
+    DOCTEST_CHECK(COLCALC::population_capacity_table_tolerant
+                      [PLANET_CLIMATE_TOXIC][PLANET_SIZE_SMALL] == 19);
+    DOCTEST_CHECK(COLCALC::population_capacity.size[PLANET_SIZE_HUGE] == 40);
+    DOCTEST_CHECK(COLCALC::population_capacity.climate[PLANET_CLIMATE_TOXIC] == 35);
+    DOCTEST_CHECK(COLCALC::population_bonus.tolerant == 50);
+
+    for (const char* source : {
+             "colony population_capacity_table gaia tiny = -1;",
+             "colony population_capacity_table gaia huge = 256;",
+             "colony population_capacity_table_tolerant toxic small = -1;",
+             "colony population_capacity_table_tolerant toxic small = 256;",
+             "colony population_capacity_table unknown small = 5;",
+             "colony population_capacity_table_tolerant toxic unknown = 5;",
+             "colony population_capacity_table_enabled = 1;"}) {
+        writes.writes.clear();
+        DOCTEST_CHECK_FALSE(Append_Decoded_(source, &writes, &diagnostic));
+    }
+
+    for (const char* path : {
+             "colony.population_capacity_table_enabled",
+             "colony.population_capacity_table.8.2",
+             "colony.population_capacity_table_tolerant.0.1"}) {
+        const config::t_variable_id id = Variable_Id_(path);
+        DOCTEST_REQUIRE(id != config::CONFIG_NO_VARIABLE);
+        std::string resolved;
+        DOCTEST_REQUIRE(config::Get_Variable_Name(id, &resolved));
+        DOCTEST_CHECK(resolved == path);
+        const config::s_config_group_descriptor* group =
+            config::Get_Config_Group(config::Get_Variable_Group(id));
+        DOCTEST_REQUIRE(group != nullptr);
+        DOCTEST_CHECK(group->save);
+        DOCTEST_CHECK(group->synchronize);
+    }
+
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+    DOCTEST_CHECK_FALSE(COLCALC::population_capacity_table_enabled);
+    DOCTEST_CHECK(COLCALC::population_capacity_table
+                      [PLANET_CLIMATE_TERRAN][PLANET_SIZE_MEDIUM] == 12);
+    DOCTEST_CHECK(COLCALC::population_capacity_table_tolerant
+                      [PLANET_CLIMATE_TOXIC][PLANET_SIZE_SMALL] == 5);
+}
+
 DOCTEST_TEST_CASE("Advanced City Planning population bonus preserves the classic default") {
     config::s_config_state state;
     DOCTEST_REQUIRE(config::Initialize_Defaults(&state));

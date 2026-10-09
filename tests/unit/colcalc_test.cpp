@@ -570,6 +570,127 @@ DOCTEST_TEST_CASE("reported population capacities do not exceed colony storage")
         previous_max_population;
 }
 
+DOCTEST_TEST_CASE("population capacity tables reproduce every classic formula result") {
+    TEST_COLONY_POP_GROWTH::Reset_();
+    const bool previous_enabled = COLCALC::population_capacity_table_enabled;
+    const uint8_t expected[PLANET_CLIMATE_COUNT][PLANET_SIZE_COUNT] = {
+        {1, 3, 4, 5, 6},
+        {1, 3, 4, 5, 6},
+        {1, 3, 4, 5, 6},
+        {1, 3, 4, 5, 6},
+        {1, 3, 4, 5, 6},
+        {1, 3, 4, 5, 6},
+        {2, 4, 6, 8, 10},
+        {3, 6, 9, 12, 15},
+        {4, 8, 12, 16, 20},
+        {5, 10, 15, 20, 25},
+    };
+
+    for (int climate = 0; climate < PLANET_CLIMATE_COUNT; ++climate) {
+        for (int8_t size = 0; size < PLANET_SIZE_COUNT; ++size) {
+            for (uint8_t immune = 0; immune <= 1; ++immune) {
+                COLCALC::population_capacity_table_enabled = false;
+                const int formula = COLCALC::Size_And_Climate_Max_Population(
+                    size, climate, immune);
+                COLCALC::population_capacity_table_enabled = true;
+                DOCTEST_CHECK(COLCALC::Size_And_Climate_Max_Population(
+                                  size, climate, immune) == formula);
+                if (immune == 0) {
+                    DOCTEST_CHECK(formula == expected[climate][size]);
+                }
+            }
+        }
+    }
+    COLCALC::population_capacity_table_enabled = previous_enabled;
+}
+
+DOCTEST_TEST_CASE("population table overrides are independent of formula settings") {
+    TEST_COLONY_POP_GROWTH::Reset_();
+    const bool previous_enabled = COLCALC::population_capacity_table_enabled;
+    const auto previous_capacity = COLCALC::population_capacity;
+    const int8_t previous_tolerant = COLCALC::population_bonus.tolerant;
+    uint8_t& normal = COLCALC::population_capacity_table
+        [PLANET_CLIMATE_TOXIC][PLANET_SIZE_SMALL];
+    uint8_t& tolerant = COLCALC::population_capacity_table_tolerant
+        [PLANET_CLIMATE_TOXIC][PLANET_SIZE_SMALL];
+    const uint8_t previous_normal = normal;
+    const uint8_t previous_immune = tolerant;
+    normal = 7;
+    tolerant = 11;
+    COLCALC::population_capacity.size[PLANET_SIZE_SMALL] = 20;
+    COLCALC::population_capacity.climate[PLANET_CLIMATE_TOXIC] = 40;
+    COLCALC::population_bonus.tolerant = 50;
+
+    COLCALC::population_capacity_table_enabled = false;
+    DOCTEST_CHECK(COLCALC::Size_And_Climate_Max_Population(
+                      PLANET_SIZE_SMALL, PLANET_CLIMATE_TOXIC, 0) == 8);
+    DOCTEST_CHECK(COLCALC::Size_And_Climate_Max_Population(
+                      PLANET_SIZE_SMALL, PLANET_CLIMATE_TOXIC, 1) == 18);
+
+    COLCALC::population_capacity_table_enabled = true;
+    DOCTEST_CHECK(COLCALC::Size_And_Climate_Race_Pop_Limit(
+                      PLANET_SIZE_SMALL, PLANET_CLIMATE_TOXIC, 0) == 7);
+    MOX::player[0].traits[TRAIT_ENVIRONMENT_IMMUNE] = 1;
+    DOCTEST_CHECK(COLCALC::Size_And_Climate_Race_Pop_Limit(
+                      PLANET_SIZE_SMALL, PLANET_CLIMATE_TOXIC, 0) == 11);
+    DOCTEST_CHECK(COLCALC::Size_And_Climate_Race_Pop_Limit(
+                      PLANET_SIZE_SMALL, PLANET_CLIMATE_TOXIC, MAX_PLAYERS) == 11);
+    DOCTEST_CHECK(COLCALC::Size_And_Climate_Max_Population(
+                      PLANET_SIZE_SMALL, PLANET_CLIMATE_BARREN, 0) == 3);
+
+    normal = previous_normal;
+    tolerant = previous_immune;
+    COLCALC::population_capacity = previous_capacity;
+    COLCALC::population_bonus.tolerant = previous_tolerant;
+    COLCALC::population_capacity_table_enabled = previous_enabled;
+}
+
+DOCTEST_TEST_CASE("population tables preserve climate adjustments bonuses and storage cap") {
+    TEST_COLONY_POP_GROWTH::Reset_();
+    const bool previous_enabled = COLCALC::population_capacity_table_enabled;
+    const uint8_t previous_aquatic_treatment = COLCALC::aquatic_treats_tundra_as_swamp;
+    uint8_t& normal = COLCALC::population_capacity_table
+        [PLANET_CLIMATE_TERRAN][PLANET_SIZE_SMALL];
+    uint8_t& tolerant = COLCALC::population_capacity_table_tolerant
+        [PLANET_CLIMATE_TERRAN][PLANET_SIZE_SMALL];
+    const uint8_t previous_normal = normal;
+    const uint8_t previous_immune = tolerant;
+    normal = 13;
+    tolerant = 35;
+    COLCALC::population_capacity_table_enabled = true;
+    MOX::player[0].traits[TRAIT_AQUATIC] = 1;
+
+    s_planet_data* planet = &MOX::planet[0];
+    planet->colony_index = -1;
+    planet->size = PLANET_SIZE_SMALL;
+    planet->climate = PLANET_CLIMATE_TUNDRA;
+    DOCTEST_CHECK(COLCALC::Planet_Max_Population_For_Player(planet, 0) == 13);
+    MOX::player[0].traits[TRAIT_ENVIRONMENT_IMMUNE] = 1;
+    DOCTEST_CHECK(COLCALC::Planet_Max_Population_For_Player(planet, 0) == 35);
+    MOX::player[0].traits[TRAIT_SUBTERRANEAN] = 1;
+    DOCTEST_CHECK(COLCALC::Planet_Max_Population_For_Player(planet, 0) == 39);
+
+    s_colony* colony = &MOX::colony[0];
+    colony->owner = 0;
+    colony->planet = 0;
+    colony->climate = PLANET_CLIMATE_TUNDRA;
+    colony->buildings[BUILDING_BIOSPHERES] = 1;
+    DOCTEST_CHECK(COLCALC::Colony_Race_Pop_Limit(colony, 0) == 41);
+    MOX::player[0].tech_applications[TECH_APP_ADVANCED_CITY_PLANNING] =
+        TECH_RESEARCH_STATUS_RESEARCHED;
+    DOCTEST_CHECK(COLCALC::Colony_Race_Pop_Limit(colony, 0) == 42);
+    DOCTEST_CHECK(COLCALC::Planet_Max_Population_For_Player(planet, 0) == 42);
+
+    COLCALC::aquatic_treats_tundra_as_swamp = 1;
+    DOCTEST_CHECK(COLCALC::Size_And_Climate_Race_Pop_Limit(
+                      PLANET_SIZE_SMALL, PLANET_CLIMATE_TUNDRA, 0) == 11);
+
+    normal = previous_normal;
+    tolerant = previous_immune;
+    COLCALC::aquatic_treats_tundra_as_swamp = previous_aquatic_treatment;
+    COLCALC::population_capacity_table_enabled = previous_enabled;
+}
+
 DOCTEST_TEST_CASE("Android room check supports a capacity of exactly 42") {
     TEST_COLONY_POP_GROWTH::Reset_();
 

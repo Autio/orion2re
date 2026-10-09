@@ -51,6 +51,9 @@ namespace COLCALC {
     };
 
     extern s_population_capacity population_capacity;
+    extern bool population_capacity_table_enabled;
+    extern uint8_t population_capacity_table[PLANET_CLIMATE_COUNT][PLANET_SIZE_COUNT];
+    extern uint8_t population_capacity_table_tolerant[PLANET_CLIMATE_COUNT][PLANET_SIZE_COUNT];
     extern s_population_bonus population_bonus;
 
     struct s_misc_costs {

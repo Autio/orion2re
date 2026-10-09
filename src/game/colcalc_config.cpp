@@ -50,6 +50,32 @@ namespace COLCALC {
         {25, 25, 25, 25, 25, 25, 40, 60, 80, 100},
     };
 
+    bool population_capacity_table_enabled = false;
+    uint8_t population_capacity_table[PLANET_CLIMATE_COUNT][PLANET_SIZE_COUNT] = {
+        {1, 3, 4, 5, 6},
+        {1, 3, 4, 5, 6},
+        {1, 3, 4, 5, 6},
+        {1, 3, 4, 5, 6},
+        {1, 3, 4, 5, 6},
+        {1, 3, 4, 5, 6},
+        {2, 4, 6, 8, 10},
+        {3, 6, 9, 12, 15},
+        {4, 8, 12, 16, 20},
+        {5, 10, 15, 20, 25},
+    };
+    uint8_t population_capacity_table_tolerant[PLANET_CLIMATE_COUNT][PLANET_SIZE_COUNT] = {
+        {3, 5, 8, 10, 13},
+        {3, 5, 8, 10, 13},
+        {3, 5, 8, 10, 13},
+        {3, 5, 8, 10, 13},
+        {3, 5, 8, 10, 13},
+        {3, 5, 8, 10, 13},
+        {3, 7, 10, 13, 16},
+        {4, 9, 13, 17, 21},
+        {5, 10, 15, 20, 25},
+        {5, 10, 15, 20, 25},
+    };
+
     s_population_bonus population_bonus = {
         5,
         25,

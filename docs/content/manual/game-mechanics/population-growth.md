@@ -24,6 +24,23 @@ For each race, the game calculates the limit in this order:
 
 The displayed colony limit cannot exceed 42. On a colony containing several races, the greatest applicable limit among the races present is displayed, but each race remains subject to its own capacity when another population unit is admitted. This matters when Subterranean and non-Subterranean races share a colony.
 
+### Optional capacity tables
+
+Set `colony population_capacity_table_enabled = true;` to replace the base capacity formula with direct climate-by-size lookups. The default is `false`, preserving existing mods and their size, climate, and Tolerant percentage settings.
+
+`colony population_capacity_table` supplies normal capacities; `colony population_capacity_table_tolerant` supplies capacities for Tolerant races and Androids. Both tables default to the classic formula results. Each climate row contains Tiny, Small, Medium, Large, and Huge values in that order. For example:
+
+```cfg
+colony population_capacity_table_enabled = true;
+colony population_capacity_table gaia = 5 10 15 20 25;
+colony population_capacity_table terran medium = 12;
+colony population_capacity_table_tolerant toxic small = 5;
+```
+
+Aquatic selects the adjusted climate row before lookup, including for Aquatic + Tolerant races. Subterranean, Advanced City Planning, and Biospheres still add their bonuses afterward, and the final colony limit remains capped at 42. The `pop_bonus tolerant` percentage is ignored in table mode. Radiation shields and the configured Toxic-conversion building continue to change the colony's effective climate before capacity is calculated.
+
+Legacy `population_capacity size` settings still govern Artificial Planet initialization and absolute infantry and tank limits; the new tables do not replace those settings.
+
 ## Definitions
 
 | Symbol | Meaning | Default or notes |
