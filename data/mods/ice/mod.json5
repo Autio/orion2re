@@ -9,7 +9,7 @@
   },
 
   dependencies: [
-    { id: "v150", version: "1.50.26" },
+    { id: "v150", version: "26.10" },
   ],
 
   config: "config/main.cfg",

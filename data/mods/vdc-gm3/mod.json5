@@ -9,9 +9,9 @@
   },
 
   dependencies: [
-    { id: "mirror_exhw", version: "1.50.26" },
-    { id: "noreport", version: "1.50.26" },
-    { id: "v150", version: "1.50.26" },
+    { id: "mirror_exhw", version: "26.10" },
+    { id: "noreport", version: "26.10" },
+    { id: "v150", version: "26.10" },
   ],
   conflicts: ["ice", "ice-x", "mirror", "mirror_hw", "v150i"],
 

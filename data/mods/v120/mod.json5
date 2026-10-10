@@ -2,7 +2,7 @@
   id: "v120",
   name: "Version 1.2 mod",
   description: "Approximates classic version 1.2 as close as possible with current config: Creative cost lowered back to 6 picks, Psilon race design restored, original Guardian and Antaran ship designs, Plasma Cannon, Ion Cannon and Gyro Destabilizer weapon stats restored to original values. Enjoy!",
-  version: "1.50.26",
+  version: "26.10",
 
   requires: {
     engine: ">=2.0.0 <3.0.0",

@@ -2,7 +2,7 @@
   id: "randtech",
   name: "Random Technology Tree",
   description: "Randomizes the global technology tree before player technology setup.",
-  version: "1.50.26",
+  version: "26.10",
 
   requires: {
     engine: ">=2.0.0 <3.0.0",

@@ -2,7 +2,7 @@
   id: "mirror",
   name: "Full Mirror",
   description: "Splits the galaxy into identical mirrored sectors so every player receives the same start.",
-  version: "1.50.26",
+  version: "26.10",
 
   requires: {
     engine: ">=2.0.0 <3.0.0",

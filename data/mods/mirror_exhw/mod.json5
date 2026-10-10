@@ -2,7 +2,7 @@
   id: "mirror_exhw",
   name: "Full Mirror except home systems",
   description: "Splits the galaxy into mirrored sectors while preserving each player's native home system.",
-  version: "1.50.26",
+  version: "26.10",
 
   requires: {
     engine: ">=2.0.0 <3.0.0",
