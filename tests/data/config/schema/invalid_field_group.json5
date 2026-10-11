@@ -1,0 +1,24 @@
+{
+  groups: {
+    gameplay: {
+      title: "Gameplay", description: "Gameplay settings.",
+      save: true, synchronize: true,
+    },
+  },
+  types: {},
+  records: {
+    unused: {
+      title: "Unused", description: "Unused record.",
+      fields: [
+        { id: "value", title: "Value", description: "A value.", group: "missing", type: "uint8" },
+      ],
+    },
+  },
+  parameters: {
+    enabled: {
+      title: "Enabled", description: "Enabled fixture.", group: "gameplay",
+      type: "bool", default: false,
+      bind_root: { header: "fixture.h", symbol: "fixture" }, bind: ["enabled"],
+    },
+  },
+}

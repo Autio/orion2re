@@ -1,0 +1,17 @@
+{
+  groups: {
+    interface: {
+      title: "Interface", description: "Local settings.",
+      save: false, synchronize: false,
+    },
+  },
+  types: {}, records: {},
+  parameters: {
+    volume: {
+      title: "Volume", description: "Volume fixture.", group: "interface", type: "int8",
+      constraints: { min: 0, max: 100 }, default: 101,
+      bind_root: { header: "fixture.h", symbol: "fixture" },
+      bind: ["volume"],
+    },
+  },
+}

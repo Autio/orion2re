@@ -1,0 +1,32 @@
+local function rejects(operation)
+  if pcall(operation) then
+    error("structural operation escaped galaxy generation")
+  end
+end
+
+events.on("game.initialized", function()
+  local player = game.players:get(0)
+  local system = game.systems:get(0)
+  local planet = game.planets:get(0)
+  local ship = game.ships:get(0)
+  local leader = game.leaders:get(0)
+  local nebula = game.nebulas:get(0)
+
+  rejects(function() game.map_width = 1 end)
+  rejects(function() game.map_height = 1 end)
+  rejects(function() player:set_home_planet(planet) end)
+  rejects(function() system.x = 1 end)
+  rejects(function() game.systems:copy(system) end)
+  rejects(function() system:set_wormhole(nil) end)
+  rejects(function() system:delete() end)
+  rejects(function() game.planets:copy(planet, system, 1) end)
+  rejects(function() planet:set_orbit(system, 1) end)
+  rejects(function() planet:delete() end)
+  rejects(function() game.ships:copy(ship, system) end)
+  rejects(function() ship:set_system(system) end)
+  rejects(function() ship:delete() end)
+  rejects(function() game.leaders:copy(leader, leader, system) end)
+  rejects(function() nebula.x = 1 end)
+  rejects(function() nebula:delete() end)
+  rejects(function() game.nebulas:create(1, 2, 3) end)
+end)

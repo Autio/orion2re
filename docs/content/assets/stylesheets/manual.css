@@ -1,0 +1,120 @@
+:root {
+  --md-primary-fg-color: #ffffff;
+  --md-primary-fg-color--light: #ffffff;
+  --md-primary-fg-color--dark: #eeeeee;
+  --md-primary-bg-color: #333333;
+  --md-primary-bg-color--light: #555555;
+  --md-accent-fg-color: #1155cc;
+  --md-typeset-a-color: #1155cc;
+  --md-default-bg-color: #ffffff;
+  --md-default-fg-color: #333333;
+  --md-code-bg-color: #f5f5f5;
+}
+
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.md-grid {
+  max-width: 60rem;
+}
+
+.md-header {
+  background: #ffffff;
+  border-bottom: 1px solid #dddddd;
+  box-shadow: none;
+  color: #333333;
+}
+
+.md-header__button,
+.md-header__title,
+.md-search__icon {
+  color: #333333;
+}
+
+.md-tabs {
+  background: #ffffff;
+  border-bottom: 1px solid #dddddd;
+  color: #333333;
+}
+
+.md-tabs__link {
+  color: #333333;
+  opacity: 1;
+}
+
+.md-tabs__link--active,
+.md-tabs__link:hover,
+.md-nav__link--active,
+.md-nav__link:focus,
+.md-nav__link:hover {
+  color: #1155cc;
+}
+
+.md-search__form {
+  background: #f5f5f5;
+  border: 1px solid #dddddd;
+}
+
+.md-search__input,
+.md-search__input::placeholder {
+  color: #333333;
+}
+
+.md-typeset h1,
+.md-typeset h2,
+.md-typeset h3,
+.md-typeset h4 {
+  color: #333333;
+}
+
+.md-typeset h1,
+.md-typeset h2,
+.md-typeset h3,
+.md-typeset h4 {
+  font-weight: 600;
+}
+
+.md-typeset h3 {
+  border-bottom: 1px solid #dddddd;
+  padding-bottom: 0.2em;
+}
+
+.md-typeset a {
+  color: #1155cc;
+  text-decoration: underline;
+  text-underline-offset: 0.12em;
+}
+
+.md-typeset a:focus-visible,
+.md-typeset button:focus-visible,
+.md-typeset input:focus-visible {
+  outline: 3px solid #1155cc;
+  outline-offset: 2px;
+}
+
+.md-typeset table:not([class]) {
+  border: 1px solid #dddddd;
+  box-shadow: none;
+  font-size: 0.78rem;
+}
+
+.md-typeset code,
+.md-typeset pre > code {
+  background: #f5f5f5;
+}
+
+.md-typeset .admonition,
+.md-typeset details {
+  border-color: #cccccc;
+  box-shadow: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}

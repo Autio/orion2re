@@ -1,0 +1,25 @@
+[submodule "vendors/SDL"]
+	path = vendors/SDL
+	url = https://github.com/libsdl-org/SDL.git
+[submodule "vendors/doctest"]
+	path = vendors/doctest
+	url = https://github.com/doctest/doctest.git
+	branch = master
+[submodule "vendors/libuv"]
+	path = vendors/libuv
+	url = https://github.com/libuv/libuv.git
+[submodule "vendors/lz4"]
+	path = vendors/lz4
+	url = https://github.com/lz4/lz4.git
+[submodule "vendors/miniz"]
+	path = vendors/miniz
+	url = https://github.com/richgel999/miniz.git
+[submodule "vendors/yyjson"]
+	path = vendors/yyjson
+	url = https://github.com/ibireme/yyjson.git
+[submodule "vendors/lua"]
+	path = vendors/lua
+	url = https://github.com/lua/lua.git
+[submodule "vendors/imgui"]
+	path = vendors/imgui
+	url = https://github.com/ocornut/imgui.git

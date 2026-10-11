@@ -1,0 +1,134 @@
+site_name: Orion2 Redone Project
+site_description: Documentation for the Master of Orion II restoration project
+copyright: Orion2 Redone Team
+docs_dir: content
+site_dir: !ENV [ORION2RE_DOCUMENTATION_SITE_DIR, site]
+use_directory_urls: false
+
+watch:
+  - content
+  - hooks
+  - ../specs/config
+  - ../tools/config
+
+theme:
+  name: material
+  favicon: assets/favicon.ico
+  logo: assets/favicon.ico
+  font: false
+  features:
+    - search.suggest
+    - search.highlight
+    - search.share
+    - navigation.tabs
+    - navigation.sections
+    - navigation.indexes
+    - navigation.top
+
+plugins:
+  - offline
+  - search:
+      lang: en
+  - gen-files:
+      scripts:
+        - hooks/generated-reference.py
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - footnotes
+  - toc:
+      permalink: true
+
+extra_css:
+  - assets/stylesheets/manual.css
+
+extra:
+  generator: false
+
+nav:
+  - Home: index.md
+  - Manual:
+      - manual/index.md
+      - About version 2.00:
+          - Introduction: manual/overview/introduction.md
+          - Version 2.00 highlights: manual/overview/highlights.md
+          - Compatibility: manual/overview/compatibility.md
+          - Critical bug fixes: manual/overview/critical-bug-fixes.md
+          - Multiplayer: manual/multiplayer.md
+      - User-facing changes:
+          - manual/user-facing-changes/index.md
+          - Interface and display: manual/user-facing-changes/interface.md
+          - Galaxy setup: manual/user-facing-changes/galaxy-setup.md
+          - Gameplay changes: manual/user-facing-changes/gameplay.md
+          - Build queue management: manual/user-facing-changes/build-queue.md
+      - Using mods:
+          - manual/legacy-modding/index.md
+          - Configuration: manual/legacy-modding/configuration.md
+          - Included game mods: manual/legacy-modding/included-mods.md
+      - Game mechanics:
+          - manual/game-mechanics/index.md
+          - Galaxy generation: manual/game-mechanics/galaxy-generation.md
+          - Randomness: manual/game-mechanics/randomness.md
+          - Random events: manual/game-mechanics/random-events.md
+          - Starting conditions and difficulty: manual/game-mechanics/starting-conditions.md
+          - Colonies and production: manual/game-mechanics/colonies-and-production.md
+          - Research and technology: manual/game-mechanics/research-and-technology.md
+          - Leaders: manual/game-mechanics/leaders.md
+          - Ship refitting: manual/game-mechanics/ship-refitting.md
+          - Population growth: manual/game-mechanics/population-growth.md
+          - Spying: manual/game-mechanics/spying.md
+          - Ship limits: manual/game-mechanics/ship-limits.md
+          - Ships and fleets: manual/game-mechanics/ships-and-fleets.md
+          - Tactical combat: manual/game-mechanics/tactical-combat.md
+          - Strategic combat: manual/game-mechanics/strategic-combat.md
+          - Beam weapons: manual/game-mechanics/beam-weapons.md
+          - Missile defenses: manual/game-mechanics/missile-defenses.md
+          - Anti-missile rockets: manual/game-mechanics/anti-missile-rockets.md
+          - Spherical damage: manual/game-mechanics/spherical-damage.md
+          - Shields, armor, and structure: manual/game-mechanics/shields-armor-structure.md
+          - Special systems: manual/game-mechanics/special-systems.md
+          - Raiding and orbital assault: manual/game-mechanics/raiding-and-orbital-assault.md
+          - Satellites and ground defenses: manual/game-mechanics/satellites-and-ground-defenses.md
+          - History graphs: manual/game-mechanics/history-graphs.md
+          - Victory and scoring: manual/game-mechanics/victory-and-scoring.md
+          - AI production rules: manual/game-mechanics/ai-production-rules.md
+      - Authoring Mods:
+          - Introduction: authoring-mods/index.md
+          - Packages and manifests: authoring-mods/packages-and-manifests.md
+          - Configuration overrides: authoring-mods/configuration-overrides.md
+          - VFS and asset overrides: authoring-mods/vfs-and-assets.md
+          - Text formatting: authoring-mods/text-formatting.md
+          - Lua modding: authoring-mods/lua-modding.md
+          - Events and API reference: authoring-mods/events-and-api.md
+          - Persistence, saves, and multiplayer: authoring-mods/persistence.md
+          - Migrating a 1.50 mod: authoring-mods/migrating-150.md
+          - Testing and troubleshooting: authoring-mods/testing.md
+      - Advanced tools:
+          - Internal debugger: manual/advanced-tools/debugger.md
+      - Reference:
+          - manual/reference/index.md
+          - Keyboard shortcuts: manual/reference/keyboard-shortcuts.md
+          - Acknowledgements: manual/reference/acknowledgements.md
+          - Third-party software: manual/reference/third-party-software.md
+  - Configuration:
+      - generated/configuration/index.md
+      - Interface and presentation: generated/configuration/interface-and-presentation.md
+      - New game and races: generated/configuration/new-game-and-races.md
+      - Colonies and economy: generated/configuration/colonies-and-economy.md
+      - Tactical combat: generated/configuration/tactical-combat.md
+      - Ships, fleets, and movement: generated/configuration/ships-fleets-and-movement.md
+      - Technology and ship design: generated/configuration/technology-and-ship-design.md
+      - AI and diplomacy: generated/configuration/ai-and-diplomacy.md
+      - Espionage: generated/configuration/espionage.md
+      - Leaders and officers: generated/configuration/leaders-and-officers.md
+      - Galaxy and events: generated/configuration/galaxy-and-events.md
+      - Government and victory: generated/configuration/government-and-victory.md
+      - Experimental: generated/configuration/experimental.md
+      - Allowed values: generated/configuration/allowed-values.md
+      - Structured setting fields: generated/configuration/record-layouts.md
+  - Development:
+      - development/index.md
+      - Fields: development/fields.md
+      - Networking: development/networking.md
+      - Threading and SDL: development/threading.md

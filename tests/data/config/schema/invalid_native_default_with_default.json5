@@ -1,0 +1,12 @@
+{
+  groups: { gameplay: { title: "Gameplay", description: "Gameplay settings.", save: true, synchronize: true } },
+  types: {},
+  records: {},
+  parameters: {
+    value: {
+      title: "Value", description: "Invalid duplicate default source.", group: "gameplay",
+      type: "uint8", default: 1, default_source: "native",
+      bind_root: { header: "fixture.h", symbol: "fixture.value" },
+    },
+  },
+}

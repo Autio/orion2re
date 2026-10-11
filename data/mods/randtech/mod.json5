@@ -1,0 +1,18 @@
+{
+  id: "randtech",
+  name: "Random Technology Tree",
+  description: "Randomizes the global technology tree before player technology setup.",
+  version: "1.50.26",
+
+  requires: {
+    engine: ">=2.0.0 <3.0.0",
+  },
+
+  config: "config/main.cfg",
+
+  lua: {
+    api: 1,
+    storage_version: 1,
+    migrations: [],
+  },
+}

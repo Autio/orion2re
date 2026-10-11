@@ -1,0 +1,18 @@
+{
+  groups: { gameplay: { title: "Gameplay", description: "Gameplay settings.", save: true, synchronize: true } },
+  types: {},
+  records: {
+    item: {
+      title: "Item", description: "Invalid nested source.",
+      fields: [
+        { id: "value", title: "Value", description: "Nested value.", type: "uint8", default_source: "native", bind: ["value"] },
+      ],
+    },
+  },
+  parameters: {
+    item: {
+      title: "Item", description: "Item value.", group: "gameplay", type: "item",
+      default: { value: 1 }, bind_root: { header: "fixture.h", symbol: "fixture.item" },
+    },
+  },
+}

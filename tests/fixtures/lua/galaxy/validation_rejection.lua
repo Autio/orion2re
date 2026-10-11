@@ -1,0 +1,55 @@
+local function rejects(operation)
+  if pcall(operation) then
+    error("invalid operation was accepted")
+  end
+end
+
+services.register("galaxy_generator", 1, function()
+  local first, second = game.systems:get(0), game.systems:get(1)
+  local home, remote = game.planets:get(0), game.planets:get(1)
+  rejects(function() first.x = -1 end)
+  rejects(function() first.y = game.map_height end)
+  rejects(function() first.spectral_class = 7 end)
+  rejects(function() first.special = 12 end)
+  rejects(function() first.visited = 256 end)
+  rejects(function() first.size = 2 end)
+  first:set_wormhole(second)
+  rejects(function() first:set_wormhole(first) end)
+  if first.wormhole ~= second or second.wormhole ~= first then
+    error("rejected wormhole change mutated the valid pair")
+  end
+  first:set_wormhole(nil)
+  rejects(function() first:delete() end)
+
+  rejects(function() home.size = 5 end)
+  rejects(function() home.gravity = 3 end)
+  rejects(function() home.climate = 10 end)
+  rejects(function() home.minerals = 5 end)
+  rejects(function() home:set_special(12) end)
+  rejects(function()
+    home:set_special(defines.planet_special.space_debris)
+  end)
+  rejects(function() home:set_orbit(second, 5) end)
+  rejects(function() home:set_orbit(second, 3) end)
+  rejects(function() home:delete() end)
+  rejects(function() game.planets:copy(home, second, 3) end)
+
+  rejects(function() game.ships:get(0):set_system(nil) end)
+  rejects(function() game.ships:copy(nil, first) end)
+  rejects(function() game.players:get(1):set_home_planet(remote) end)
+  rejects(function()
+    game.players:get(1):set_home_planet(game.planets:get(2))
+  end)
+  rejects(function()
+    game.leaders:copy(
+      game.leaders:get(0), game.leaders:get(1), first)
+  end)
+
+  rejects(function() game.nebulas:create(-1, 0, 0) end)
+  rejects(function() game.nebulas:create(0, game.map_height, 0) end)
+  rejects(function() game.nebulas:create(0, 0, 12) end)
+  local nebula = game.nebulas:create(1, 2, 3)
+  rejects(function() nebula.x = game.map_width end)
+  rejects(function() nebula.y = -1 end)
+  rejects(function() nebula.type = 12 end)
+end)

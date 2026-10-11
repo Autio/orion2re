@@ -1,0 +1,12 @@
+{
+  groups: {
+    interface: {
+      title: "Interface",
+      title: "Duplicate",
+      description: "Local settings.",
+      save: false,
+      synchronize: false,
+    },
+  },
+  types: {}, records: {}, parameters: {},
+}

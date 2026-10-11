@@ -1,0 +1,25 @@
+{
+  groups: {
+    gameplay: {
+      title: "Gameplay",
+      description: "Fixture group.",
+      save: true,
+      synchronize: true,
+    },
+  },
+  types: {
+    ratio16: { kind: "ratio", component_type: "int16" },
+  },
+  records: {},
+  parameters: {
+    value: {
+      title: "Value",
+      description: "Invalid ratio binding fixture.",
+      group: "gameplay",
+      type: "ratio16",
+      default: "1/3",
+      bind_root: { header: "fixture.h", symbol: "fixture" },
+      bind: ["value"],
+    },
+  },
+}

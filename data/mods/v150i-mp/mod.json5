@@ -1,0 +1,17 @@
+{
+  id: "v150i-mp",
+  name: "Improved Multiplayer",
+  description: "Multiplayer race-pick, map, diplomacy, and interface overrides for 1.50 Improved.",
+  version: "1.50.26",
+
+  requires: {
+    engine: ">=2.0.0 <3.0.0",
+  },
+
+  dependencies: [
+    { id: "v150i", version: "1.50.26" },
+    { id: "mirror_hw", version: "1.50.26" },
+  ],
+
+  config: "config/main.cfg",
+}

@@ -1,0 +1,12 @@
+{
+  id: "v150",
+  name: "Basic",
+  description: "Basic mod",
+  version: "1.50.26",
+
+  requires: {
+    engine: ">=2.0.0 <3.0.0",
+  },
+
+  config: "config/main.cfg",
+}

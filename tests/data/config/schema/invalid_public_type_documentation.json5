@@ -1,0 +1,29 @@
+{
+  groups: {
+    test: {
+      title: "Test",
+      description: "Schema validation fixture.",
+      save: false,
+      synchronize: false,
+    },
+  },
+  types: {
+    undocumented_choice: {
+      kind: "enum",
+      base_type: "uint8",
+      values: { first: 0 },
+    },
+  },
+  records: {},
+  parameters: {
+    enabled: {
+      title: "Enabled",
+      description: "Keeps the undocumented type unused by parameters.",
+      group: "test",
+      type: "bool",
+      default: true,
+      bind_root: { header: "fixture.h", symbol: "fixture" },
+      bind: ["enabled"],
+    },
+  },
+}

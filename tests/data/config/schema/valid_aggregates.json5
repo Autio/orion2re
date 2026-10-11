@@ -1,0 +1,173 @@
+{
+  groups: {
+    gameplay: {
+      title: "Gameplay",
+      description: "Deterministic gameplay settings.",
+      save: true,
+      synchronize: true,
+    },
+    interface: {
+      title: "Interface",
+      description: "Local interface settings.",
+      save: false,
+      synchronize: false,
+    },
+  },
+  types: {
+    weapon_count: {
+      title: "Weapon count",
+      description: "Number of identical weapons installed in a slot.",
+      remarks: "Choose a value from 0 through 99.",
+      kind: "alias",
+      type: "uint8",
+      constraints: { min: 0, max: 99 },
+    },
+    weapon_id: {
+      title: "Weapon",
+      description: "Weapon selected for a ship design slot.",
+      remarks: "Use a weapon name instead of its number when possible.",
+      kind: "enum",
+      base_type: "uint8",
+      allow_numeric: true,
+      reject_unknown_numeric: true,
+      values: {
+        none: 0,
+        mass_driver: {
+          value: 4,
+          description: "A kinetic cannon that fires dense projectiles.",
+        },
+        plasma_cannon: 11,
+      },
+    },
+    weapon_slot_index: {
+      title: "Weapon slot selector",
+      description: "Friendly names for the two weapon slots.",
+      remarks: "Selectors can be used instead of numeric array positions.",
+      kind: "enum",
+      base_type: "uint8",
+      values: { primary: 1, secondary: 2 },
+    },
+    weapon_arc: {
+      title: "Weapon firing directions",
+      description: "Directions in which a weapon can fire.",
+      remarks: "Combine multiple direction names with commas.",
+      kind: "mask",
+      base_type: "uint8",
+      allow_numeric: true,
+      reject_unknown_bits: true,
+      values: { none: 0x00, all: 0x0F },
+      flags: {
+        forward: {
+          value: 0x01,
+          description: "The weapon can fire toward the front of the ship.",
+        },
+        aft: 0x02,
+        left: 0x04,
+        right: 0x08,
+      },
+    },
+    ratio16: {
+      title: "Reduction ratio",
+      description: "A fractional reduction written as numerator/denominator.",
+      remarks: "For example, 1/3 means one third.",
+      kind: "ratio",
+      component_type: "int16",
+    },
+    ship_special_bitmap: {
+      title: "Ship special systems",
+      description: "Special systems installed in a ship design.",
+      remarks: "The final flag verifies that bitmap values can cross a 32-bit boundary.",
+      kind: "bitmap",
+      bit_count: 40,
+      values: {
+        none: [],
+        self_repairing: ["automated_repair", "regeneration"],
+      },
+      flags: {
+        automated_repair: {
+          bit: 3,
+          description: "Repairs damage during combat.",
+        },
+        regeneration: {
+          bit: 39,
+          description: "Regenerates biological ship structure.",
+        },
+      },
+    },
+  },
+  records: {
+    weapon_slot: {
+      title: "Weapon slot",
+      description: "Weapon selection and quantity for one ship slot.",
+      remarks: "Every slot defines a weapon, firing direction, ammunition, and amount.",
+      fields: [
+        { id: "type", title: "Weapon", description: "Weapon installed in this slot.", type: "weapon_id", bind: ["type"] },
+        { id: "arc", title: "Firing directions", description: "Directions in which this weapon can fire.", type: "weapon_arc", bind: ["arc"] },
+        { id: "ammo", title: "Ammunition", description: "Ammunition carried for this weapon.", type: "uint8", bind: ["ammo"] },
+        { id: "amount", title: "Amount", description: "Number of weapons installed in this slot.", type: "weapon_count", bind: ["amount", "current_amount"] },
+      ],
+    },
+  },
+  parameters: {
+    guardian: {
+      title: "Guardian",
+      description: "Configures the Guardian ship used by this documentation fixture.",
+      remarks: "Change only the values you want to customize.",
+      examples: ["guardian label = \"Sentinel\";"],
+      group: "gameplay",
+      namespace: "ships",
+      bind_root: {
+        header: "fixture.h",
+        symbol: "fixture",
+      },
+      type: {
+        kind: "record",
+        fields: [
+          { id: "appearance", title: "Appearance", description: "Visual style used for the ship.", group: "interface", type: "uint8", default: 2, bind: ["appearance"] },
+          {
+            id: "weapon",
+            title: "Weapons",
+            description: "The two configurable weapon slots.",
+            bind: ["weapons"],
+            type: {
+              kind: "array",
+              count: 2,
+              index_base: 1,
+              index_type: "weapon_slot_index",
+              element: { type: "weapon_slot" },
+            },
+            default: [
+              { type: "plasma_cannon", arc: "all", ammo: 0, amount: 2 },
+              { type: "mass_driver", arc: "forward,aft", ammo: 0, amount: 10 },
+            ],
+          },
+          {
+            id: "specials",
+            title: "Special systems",
+            description: "Special systems installed in this design.",
+            type: "ship_special_bitmap",
+            default: "automated_repair,regeneration",
+            bind: ["special_device_flags"],
+          },
+          {
+            id: "label",
+            title: "Label",
+            description: "Name shown for this ship.",
+            type: "string",
+            constraints: { min_length: 1, max_length: 8, encoding: "cp850" },
+            default: "Grüße",
+            bind: ["label"],
+          },
+          {
+            id: "reduction",
+            title: "Reduction",
+            description: "Fraction used to reduce the configured value.",
+            type: "ratio16",
+            default: "2/6",
+            bind: ["reduction_numerator", "reduction_denominator"],
+          },
+        ],
+      },
+    },
+  },
+}

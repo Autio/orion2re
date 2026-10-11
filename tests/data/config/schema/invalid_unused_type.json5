@@ -1,0 +1,31 @@
+{
+  groups: {
+    test: {
+      title: "Test",
+      description: "Schema validation fixture.",
+      save: false,
+      synchronize: false,
+    },
+  },
+  types: {
+    unused_invalid_mask: {
+      internal: true,
+      kind: "mask",
+      base_type: "uint8",
+      values: { invalid_composite: 0x03 },
+      flags: { first: 0x01 },
+    },
+  },
+  records: {},
+  parameters: {
+    enabled: {
+      title: "Enabled",
+      description: "Keeps the malformed named type unused by parameters.",
+      group: "test",
+      type: "bool",
+      default: true,
+      bind_root: { header: "fixture.h", symbol: "fixture" },
+      bind: ["enabled"],
+    },
+  },
+}

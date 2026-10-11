@@ -1,0 +1,18 @@
+{
+  id: "mirror_hw",
+  name: "Only Home Systems Mirrored",
+  description: "Copies one randomly selected player's unoccupied home-system orbits to every other home system.",
+  version: "1.50.26",
+
+  requires: {
+    engine: ">=2.0.0 <3.0.0",
+  },
+
+  config: "config/main.cfg",
+
+  lua: {
+    api: 1,
+    storage_version: 1,
+    migrations: [],
+  },
+}

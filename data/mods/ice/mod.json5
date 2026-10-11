@@ -1,0 +1,22 @@
+{
+  id: "ice",
+  name: "ICE",
+  description: "More challenging Ai, modded race picks, rebalanced tech tree, improved map, and new game behavior.",
+  version: "35",
+
+  requires: {
+    engine: ">=2.0.0 <3.0.0",
+  },
+
+  dependencies: [
+    { id: "v150", version: "1.50.26" },
+  ],
+
+  config: "config/main.cfg",
+
+  lua: {
+    api: 1,
+    storage_version: 1,
+    migrations: [],
+  },
+}

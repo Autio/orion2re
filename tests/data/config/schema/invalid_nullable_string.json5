@@ -1,0 +1,12 @@
+{
+  groups: { gameplay: { title: "Gameplay", description: "Gameplay settings.", save: true, synchronize: true } },
+  types: {},
+  records: {},
+  parameters: {
+    label: {
+      title: "Label", description: "Invalid nullable buffer string.", group: "gameplay",
+      type: "string", nullable: true, default: "",
+      bind_root: { header: "fixture.h", symbol: "fixture.label" },
+    },
+  },
+}

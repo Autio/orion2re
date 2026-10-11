@@ -1,0 +1,12 @@
+{
+  id: "melee",
+  name: "Melee",
+  description: "The 1.50 two-player Melee mode and its compact tournament map.",
+  version: "0.4",
+
+  requires: {
+    engine: ">=2.0.0 <3.0.0",
+  },
+
+  config: "config/main.cfg",
+}

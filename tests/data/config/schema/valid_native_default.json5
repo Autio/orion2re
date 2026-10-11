@@ -1,0 +1,39 @@
+{
+  groups: {
+    gameplay: {
+      title: "Gameplay",
+      description: "Gameplay settings.",
+      save: true,
+      synchronize: true,
+    },
+  },
+  types: {},
+  records: {
+    pair: {
+      title: "Pair",
+      description: "Two native values.",
+      fields: [
+        { id: "left", title: "Left", description: "Left value.", type: "int16", bind: ["left"] },
+        { id: "right", title: "Right", description: "Right value.", type: "uint8", bind: ["right"] },
+      ],
+    },
+  },
+  parameters: {
+    scalar: {
+      title: "Scalar",
+      description: "Native scalar default.",
+      group: "gameplay",
+      type: "uint16",
+      default_source: "native",
+      bind_root: { header: "fixture.h", symbol: "fixture.scalar" },
+    },
+    aggregate: {
+      title: "Aggregate",
+      description: "Native aggregate defaults.",
+      group: "gameplay",
+      type: "pair",
+      default_source: "native",
+      bind_root: { header: "fixture.h", symbol: "fixture.aggregate" },
+    },
+  },
+}

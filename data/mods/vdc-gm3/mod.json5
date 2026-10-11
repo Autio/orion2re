@@ -1,0 +1,25 @@
+{
+  id: "vdc-gm3",
+  name: "VDC-GM3",
+  description: "Very Difficult Choice mod with rebalanced picks and technology tree.",
+  version: "72.10",
+
+  requires: {
+    engine: ">=2.0.0 <3.0.0",
+  },
+
+  dependencies: [
+    { id: "mirror_exhw", version: "1.50.26" },
+    { id: "noreport", version: "1.50.26" },
+    { id: "v150", version: "1.50.26" },
+  ],
+  conflicts: ["ice", "ice-x", "mirror", "mirror_hw", "v150i"],
+
+  config: "config/main.cfg",
+
+  lua: {
+    api: 1,
+    storage_version: 1,
+    migrations: [],
+  },
+}

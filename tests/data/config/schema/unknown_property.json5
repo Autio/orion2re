@@ -1,0 +1,17 @@
+{
+  groups: {
+    interface: {
+      title: "Interface", description: "Local settings.",
+      save: false, synchronize: false,
+    },
+  },
+  types: {}, records: {},
+  parameters: {
+    name: {
+      title: "Name", description: "Name fixture.", group: "interface", type: "string",
+      constraints: { format: "identifier" }, default: "name",
+      bind_root: { header: "fixture.h", symbol: "fixture" },
+      bind: ["name"],
+    },
+  },
+}

@@ -1,0 +1,17 @@
+{
+  id: "ice-x",
+  name: "ICE-X",
+  description: "Hardest Ai and Antarans layered on the base ICE mod.",
+  version: "35",
+
+  requires: {
+    engine: ">=2.0.0 <3.0.0",
+  },
+
+  dependencies: [
+    { id: "ice", version: "35" },
+  ],
+  load_after: ["ice"],
+
+  config: "config/difficulty.cfg",
+}

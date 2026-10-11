@@ -1,0 +1,17 @@
+orion2re/
+.vs
+.vocode
+.vocode
+.DS_Store
+Release
+build/
+out/
+/headers.md
+/test-releases/
+/CMakeUserPresets.json
+/cmake/local-user.cmake
+/src/config/generated/
+/.venv/
+build-*/
+Testing
+*.pyc

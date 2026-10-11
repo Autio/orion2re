@@ -1,0 +1,22 @@
+{
+  groups: {
+    gameplay: {
+      title: "Gameplay",
+      description: "Gameplay settings.",
+      save: true,
+      synchronize: true,
+    },
+  },
+  types: {},
+  records: {},
+  parameters: {
+    count: {
+      title: "Count",
+      description: "Invalid arena scalar.",
+      group: "gameplay",
+      type: { type: "uint8", string_storage: "arena" },
+      default: 1,
+      bind_root: { header: "fixture.h", symbol: "fixture.count" },
+    },
+  },
+}

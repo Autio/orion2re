@@ -1,0 +1,43 @@
+{
+  groups: {
+    gameplay: {
+      title: "Gameplay",
+      description: "Interleaved namespace fixture group.",
+      save: true,
+      synchronize: true,
+    },
+  },
+  types: {},
+  records: {},
+  parameters: {
+    first: {
+      title: "First combat setting",
+      description: "First member of the combat namespace.",
+      group: "gameplay",
+      namespace: "combat",
+      type: "bool",
+      default: true,
+      bind_root: { header: "fixture.h", symbol: "fixture" },
+      bind: ["first"],
+    },
+    standalone: {
+      title: "Standalone setting",
+      description: "Root setting declared between namespace members.",
+      group: "gameplay",
+      type: "uint8",
+      default: 7,
+      bind_root: { header: "fixture.h", symbol: "fixture" },
+      bind: ["standalone"],
+    },
+    second: {
+      title: "Second combat setting",
+      description: "Second member of the combat namespace.",
+      group: "gameplay",
+      namespace: "combat",
+      type: "int8",
+      default: -2,
+      bind_root: { header: "fixture.h", symbol: "fixture" },
+      bind: ["second"],
+    },
+  },
+}

@@ -1,0 +1,12 @@
+{
+  id: "treeless",
+  name: "Hidden Tech Tree",
+  description: "Future techs cannot be browsed in the research window.",
+  version: "1.50.26",
+
+  requires: {
+    engine: ">=2.0.0 <3.0.0",
+  },
+
+  config: "config/main.cfg",
+}

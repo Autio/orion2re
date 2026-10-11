@@ -1,0 +1,33 @@
+{
+  groups: {
+    gameplay: {
+      title: "Gameplay",
+      description: "Fixture group.",
+      save: true,
+      synchronize: true,
+    },
+  },
+  types: {
+    bad_bitmap: {
+      title: "Bad bitmap",
+      description: "Invalid bitmap fixture.",
+      kind: "bitmap",
+      bit_count: 40,
+      flags: {
+        outside: 40,
+      },
+    },
+  },
+  records: {},
+  parameters: {
+    value: {
+      title: "Value",
+      description: "Invalid bitmap fixture.",
+      group: "gameplay",
+      type: "bad_bitmap",
+      default: "outside",
+      bind_root: { header: "fixture.h", symbol: "fixture" },
+      bind: ["value"],
+    },
+  },
+}

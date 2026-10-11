@@ -1,0 +1,699 @@
+#include "pch.h"
+
+namespace spy {
+    int16_t spy_bonuses[MAX_PLAYERS * 2];
+
+    void __cdecl Compute_Spy_Bonuses(s_player* player, int16_t* defense_bonus_out, int16_t* attack_bonus_out) {
+        int32_t telepathic_trait_bonus =
+            (int8_t)player->traits[TRAIT_TELEPATHIC] * (int8_t)telepathic_bonus;
+        int32_t tech_and_trait_bonus = Tech_Spy_Bonus(player) + player->traits[TRAIT_SPYING_BONUS];
+        int32_t base_bonus = tech_and_trait_bonus + telepathic_trait_bonus;
+
+        int32_t max_leader_def_bonus = 0;
+        int32_t max_leader_atk_bonus = 0;
+
+        int32_t player_idx = (int32_t)(player - MOX::player);
+
+        for (int32_t i = 0; i < MAX_LEADERS; ++i) {
+            s_leader_data* leader = &MOX::leaders[i];
+
+            if (leader->player_index == player_idx) {
+                if (leader->status >= 0 && leader->status <= 2) {
+                    if (!COLCALC::Leader_At_Anomaly(leader)) {
+                        int32_t current_def_skill = 0;
+                        if (leader->general_skills & LEADER_GENERAL_SKILL_SPY_MASTER2) {
+                            current_def_skill = OFFICER::Owned_Officer_Level(i) * 3 + 3;
+                        } else if (leader->general_skills & LEADER_GENERAL_SKILL_SPY_MASTER) {
+                            current_def_skill = OFFICER::Owned_Officer_Level(i) * 2 + 2;
+                        }
+
+                        if (current_def_skill > max_leader_def_bonus) {
+                            max_leader_def_bonus = current_def_skill;
+                        }
+
+                        int32_t current_atk_skill = 0;
+                        if (leader->general_skills & LEADER_GENERAL_SKILL_TELEPATH2) {
+                            current_atk_skill = (OFFICER::Owned_Officer_Level(i) + 1) * 3;
+                        } else if (leader->general_skills & LEADER_GENERAL_SKILL_TELEPATH) {
+                            current_atk_skill = (OFFICER::Owned_Officer_Level(i) + 1) * 2;
+                        }
+
+                        if (current_atk_skill > max_leader_atk_bonus) {
+                            max_leader_atk_bonus = current_atk_skill;
+                        }
+                    }
+                }
+            }
+        }
+
+        *defense_bonus_out = (int16_t)(max_leader_def_bonus + base_bonus);
+
+        int32_t gov_bonus = lookup_table[player->traits[TRAIT_CURRENT_GOVERNMENT]];
+        *attack_bonus_out = (int16_t)(gov_bonus + max_leader_atk_bonus + base_bonus);
+    }
+
+    void __cdecl Resolve_Spies() {
+        uint8_t num_active_players = 0;
+        int8_t active_player_indices[MAX_PLAYERS];
+
+        Resolve_Assassins();
+
+        for (int16_t i = 0; i < MOX::NUM_PLAYERS; ++i) {
+            // player structure size: 0xEA9 (3753 bytes)
+            if (MOX::player[i].eliminated == 0) {
+                active_player_indices[num_active_players] = (int8_t)i;
+                num_active_players++;
+
+                Compute_Spy_Bonuses(
+                    &MOX::player[i],
+                    &spy_bonuses[i * 2],
+                    &spy_bonuses[i * 2 + 1]);
+            }
+        }
+
+        RUSS::Shuffle_Char(active_player_indices, (int16_t)num_active_players);
+
+        if (num_active_players != 0) {
+            for (int16_t j = 0; j < (int16_t)num_active_players; ++j) {
+                int8_t player_idx = active_player_indices[j];
+                if (MOX::player[player_idx].objectives != PLAYER_OBJECTIVE_HUMAN) {
+                    Allocate_AI_Spies(&MOX::player[player_idx]);
+                }
+            }
+        }
+
+        RUSS::Shuffle_Char(active_player_indices, (int16_t)num_active_players);
+
+        if (num_active_players != 0) {
+            for (int16_t j = 0; j < (int16_t)num_active_players; ++j) {
+                int8_t player_idx = active_player_indices[j];
+                Resolve_Player_Spies(&MOX::player[player_idx]);
+            }
+        }
+    }
+
+    void __cdecl Bring_Home_Spies_Vs(int16_t player_idx, int16_t enemy_idx) {
+        int16_t spies_at_enemy = BILL::Get_Their_Spy_Number(player_idx, enemy_idx);
+
+        if (spies_at_enemy != 0) {
+            int16_t spies_at_home = BILL::Get_Their_Spy_Number(player_idx, player_idx);
+            int32_t total_spies = (int32_t)spies_at_home + (int32_t)spies_at_enemy;
+
+            if (total_spies > 0x3f /* 63 */) {
+                total_spies = 0x3f;
+            }
+
+            BILL::Set_Their_Spy_Number(player_idx, player_idx, (uint8_t)total_spies);
+            BILL::Set_Their_Spy_Number(player_idx, enemy_idx, 0);
+        }
+    }
+
+    void __cdecl Resolve_Assassins() {
+        for (int32_t leader_idx = MAX_LEADERS - 1;
+             leader_idx >= 0;
+             --leader_idx) {
+            s_leader_data* leader = &MOX::leaders[leader_idx];
+
+            // player_index != -1 and status is active (0) or assigned (1)
+            if (leader->player_index != -1 && (leader->status == 0 || leader->status == 1)) {
+                int32_t chance = 0;
+
+                if ((leader->general_skills & LEADER_GENERAL_SKILL_ASSASSIN2) != 0) {
+                    chance = OFFICER::Owned_Officer_Level(leader_idx) * 3 + 3;
+                } else if ((leader->general_skills & LEADER_GENERAL_SKILL_ASSASSIN) != 0) {
+                    chance = OFFICER::Owned_Officer_Level(leader_idx) * 2 + 2;
+                }
+
+                if (chance != 0) {
+                    if ((int16_t)game_random::Random(100) <= chance) {
+                        spy::Leader_Assassinates(leader);
+                    }
+                }
+            }
+        }
+    }
+
+    void __cdecl Allocate_AI_Spies(s_player* player) {
+        if (player->eliminated != 0) {
+            return;
+        }
+
+        if (MOX::settings.game_difficulty < GAME_DIFFICULTY_EASY) {
+            return;
+        }
+
+        int16_t player_idx = (int16_t)(player - MOX::player);
+
+        int32_t sum_spies_100 = 0;
+        int32_t sum_spies_100_bonused = 0;
+        int32_t max_spy_val_100 = 0;
+
+        int32_t sum_spies_other = 0;
+        int32_t sum_spies_other_bonused = 0;
+        int32_t max_spy_val_other = 0;
+
+        int32_t total_spies = 0;
+
+        if (MOX::NUM_PLAYERS > 0) {
+            for (int16_t i = 0; i < MOX::NUM_PLAYERS; i++) {
+                int16_t their_spies_here = BILL::Get_Their_Spy_Number(i, player_idx);
+                int16_t our_spies_there = BILL::Get_Their_Spy_Number(player_idx, i);
+
+                total_spies += our_spies_there;
+                BILL::Set_Their_Spy_Number(player_idx, i, 0);
+
+                if (their_spies_here > 0 && i != player_idx) {
+                    int32_t val = their_spies_here;
+                    if (MOX::player[i].objectives == PLAYER_OBJECTIVE_HUMAN) {
+                        sum_spies_100 += val;
+                        sum_spies_100_bonused += val * spy_bonuses[i * 2];
+                        if (max_spy_val_100 < val) {
+                            max_spy_val_100 = val;
+                        }
+                    } else {
+                        sum_spies_other += val;
+                        sum_spies_other_bonused += val * spy_bonuses[i * 2];
+                        if (max_spy_val_other < val) {
+                            max_spy_val_other = val;
+                        }
+                    }
+                }
+            }
+        }
+
+        if (total_spies == 0) {
+            if ((*AIDATA::ai_player_info)[player_idx].n_contacts > 0 && MOX::stardate > 35030) {
+                if (MOX::settings.game_difficulty == GAME_DIFFICULTY_IMPOSSIBLE) {
+                    if (player->objectives != PLAYER_OBJECTIVE_DIPLOMATIC) {
+                        game_random::Random(8);
+                    }
+                    if (player->traits[TRAIT_SPYING_BONUS] > 0) {
+                        game_random::Random(5);
+                    }
+                    total_spies = 1;
+                } else if (MOX::settings.game_difficulty == GAME_DIFFICULTY_HARD) {
+                    if (player->objectives == PLAYER_OBJECTIVE_DIPLOMATIC && game_random::Random(7) == 1) {
+                        total_spies = 1;
+                    } else if (game_random::Random(25) == 1) {
+                        total_spies = 1;
+                    } else if (player->traits[TRAIT_SPYING_BONUS] > 0 && game_random::Random(6) == 1) {
+                        total_spies = 1;
+                    }
+                } else if (MOX::settings.game_difficulty == GAME_DIFFICULTY_AVERAGE) {
+                    if (player->objectives == PLAYER_OBJECTIVE_DIPLOMATIC && game_random::Random(13) == 1) {
+                        total_spies = 1;
+                    } else if (player->traits[TRAIT_SPYING_BONUS] > 0 && game_random::Random(13) == 1) {
+                        total_spies = 1;
+                    }
+                }
+            }
+        }
+
+        if (total_spies <= 0) {
+            return;
+        }
+
+        int32_t allocated_home = 0;
+        if (spy_bonuses[player_idx * 2] >= 0) {
+            if (MOX::settings.game_difficulty > GAME_DIFFICULTY_AVERAGE) {
+                allocated_home = max_spy_val_100;
+            } else {
+                allocated_home = max_spy_val_100;
+                if (max_spy_val_100 <= max_spy_val_other) {
+                    allocated_home = max_spy_val_other;
+                }
+            }
+            if (allocated_home > total_spies) {
+                allocated_home = total_spies;
+            }
+        } else {
+            allocated_home = total_spies;
+        }
+
+        if (allocated_home > 0x3f) {
+            allocated_home = 0x3f;
+        }
+
+        BILL::Set_Their_Spy_Number(player_idx, player_idx, (uint8_t)allocated_home);
+
+        if (allocated_home >= total_spies) {
+            return;
+        }
+
+        int32_t remaining_spies = total_spies - allocated_home;
+        uint32_t target_weights[MAX_PLAYERS] = {0};
+        uint32_t max_weight = 0;
+
+        if (MOX::NUM_PLAYERS > 0) {
+            for (int16_t i = 0; i < MOX::NUM_PLAYERS; i++) {
+                if (i == player_idx) {
+                    continue;
+                }
+
+                if (MOX::player[player_idx].contact[i] != 0 && MOX::player[player_idx].stop_spying_duration[i] == 0) {
+                    int16_t target_home_spies = BILL::Get_Their_Spy_Number(i, i);
+                    uint32_t total_cost = 0;
+
+                    for (int16_t j = 0; j < 204; j++) {
+                        if (MOX::player[i].tech_applications[j] == TECH_RESEARCH_STATUS_RESEARCHED) {
+                            if (COLCALC::Player_May_Get_Tech_App(player, j)) {
+                                int16_t field_id = TECHDATA::technology_applications[j].tech_field_id;
+                                if (field_id != 0) {
+                                    total_cost += TECHDATA::technology_fields[field_id].cost;
+                                }
+                            }
+                        }
+                    }
+
+                    if (total_cost != 0) {
+                        if (target_home_spies > 0) {
+                            int16_t foreign_spies = 0;
+                            for (int16_t k = 0; k < MOX::NUM_PLAYERS; k++) {
+                                if (k != i) {
+                                    foreign_spies += BILL::Get_Their_Spy_Number(k, i);
+                                }
+                            }
+
+                            if (foreign_spies > 0) {
+                                uint32_t u_sum = (uint32_t)(foreign_spies + remaining_spies);
+                                total_cost = (u_sum * total_cost) / (uint32_t)remaining_spies;
+                            }
+
+                            int32_t their_spy_bonus = spy_bonuses[i * 2 + 1];
+                            uint32_t mult1 = 100 - their_spy_bonus;
+                            total_cost = (total_cost * mult1) / 100;
+
+                            if (their_spy_bonus >= 25) {
+                                uint32_t mult2 = 125 - their_spy_bonus;
+                                total_cost = (total_cost * mult2) / 100;
+                            }
+
+                            total_cost /= (uint32_t)target_home_spies;
+                        }
+
+                        if (remaining_spies > target_home_spies) {
+                            uint32_t diff = (uint32_t)(remaining_spies - target_home_spies);
+                            total_cost *= diff;
+                        }
+
+                        total_cost++;
+
+                        target_weights[i] = total_cost;
+                        if (total_cost > max_weight) {
+                            max_weight = total_cost;
+                        }
+                    }
+                }
+            }
+        }
+
+        while (remaining_spies > 0) {
+            int16_t target = RUSS::Get_Weighted_Choice_Int(target_weights, MOX::NUM_PLAYERS);
+
+            if (target == -1) {
+                int32_t sum = remaining_spies + allocated_home;
+                if (sum >= 0x3f) {
+                    BILL::Set_Their_Spy_Number(player_idx, player_idx, 0x3f);
+                } else {
+                    BILL::Set_Their_Spy_Number(player_idx, player_idx, (uint8_t)sum);
+                }
+                remaining_spies = 0;
+            } else {
+                if (remaining_spies > 0x3f) {
+                    BILL::Set_Their_Spy_Number(player_idx, target, 0x3f);
+                    remaining_spies -= 0x3f;
+                } else {
+                    BILL::Set_Their_Spy_Number(player_idx, target, (uint8_t)remaining_spies);
+                    remaining_spies = 0;
+                }
+
+                int16_t mission = 0;
+                if (MOX::player[player_idx].personality == PLAYER_PERSONALITY_ERRATIC) {
+                    if (game_random::Random(8) == 1) {
+                        mission = 1;
+                    }
+                }
+                BILL::Set_Their_Spy_Mission(player_idx, target, (int8_t)mission);
+            }
+        }
+    }
+
+    void __cdecl Resolve_Player_Spies(s_player* player) {
+        int16_t player_idx = (int16_t)(player - MOX::player);
+        int16_t def_spies = BILL::Get_Their_Spy_Number(player_idx, player_idx);
+        int32_t def_spies_bonus = spy::N_Spies_Bonus(def_spies);
+        int32_t caught_spies = 0;
+
+        for (int16_t other_plr_idx = 0; other_plr_idx < MOX::NUM_PLAYERS; other_plr_idx++) {
+            if (other_plr_idx == player_idx) {
+                continue;
+            }
+
+            s_player* other_player = &MOX::player[other_plr_idx];
+            int16_t other_spies = BILL::Get_Their_Spy_Number(other_plr_idx, player_idx);
+            int32_t other_spies_bonus = spy::N_Spies_Bonus(other_spies);
+
+            if (other_spies == 0) {
+                continue;
+            }
+
+            int32_t rand1 = game_random::Random(random_bonus.attacker);
+            int32_t rand2 = game_random::Random(random_bonus.defender);
+
+            int32_t other_off = spy_bonuses[other_plr_idx * 2];
+            int32_t my_def = spy_bonuses[player_idx * 2 + 1];
+
+            int32_t roll = other_spies_bonus + other_off - my_def - def_spies_bonus - rand2 + rand1;
+
+            if (other_player->objectives != PLAYER_OBJECTIVE_HUMAN && player->objectives == PLAYER_OBJECTIVE_HUMAN) {
+                roll += MOX::settings.game_difficulty - GAME_DIFFICULTY_AVERAGE;
+            }
+
+            int16_t mission = BILL::Get_Their_Spy_Mission(other_plr_idx, player_idx);
+
+            if (mission == 0) {
+                if (roll >= success.steal || rand1 == guaranteed_roll.steal) {
+                    uint8_t flag = 0;
+                    if (roll >= success.steal_and_frame ||
+                        rand1 == guaranteed_roll.steal) {
+                        flag = 1;
+                    }
+                    spy::Steal_App(other_player, player, flag);
+                }
+            } else if (mission == 1) {
+                if (roll >= success.sabotage || rand1 == guaranteed_roll.sabotage) {
+                    int16_t blamed = other_plr_idx;
+                    if (roll >= success.sabotage_and_frame ||
+                        rand1 == guaranteed_roll.sabotage) {
+                        spy::Frame_Another(other_plr_idx, player_idx, &blamed, -1);
+                    }
+                    spy::Destroy_Random_Building(other_plr_idx, player_idx, blamed);
+                }
+            }
+
+            int32_t rand3 = game_random::Random(100);
+            int32_t rand4 = game_random::Random(100);
+
+            int32_t catch_roll = other_off - my_def - def_spies_bonus - rand4 + rand3 + other_spies_bonus - 20;
+
+            if (BILL::Get_Their_Spy_Mission(other_plr_idx, player_idx) == 2) {
+                catch_roll += 20;
+            }
+
+            if (catch_roll >= 80 || rand3 == 100) {
+                caught_spies++;
+            }
+
+            if (catch_roll <= -80 || rand4 == 100) {
+                other_spies--;
+                BILL::Set_Their_Spy_Number(other_plr_idx, player_idx, (uint8_t)other_spies);
+
+                s_MSG msg;
+                memset(&msg, 0, sizeof(s_MSG));
+                msg.msg_type = MSG_TYPE_LOST_ATTACKING_SPY;
+                msg.u.lost_attacking_spy.player_idx = player_idx;
+                MSG_::Add_Msg(msg, other_plr_idx);
+            }
+        }
+
+        if (caught_spies > 0) {
+            int16_t def_spies_rem = def_spies - caught_spies;
+            if (def_spies_rem < 0) {
+                def_spies_rem = 0;
+            }
+            BILL::Set_Their_Spy_Number(player_idx, player_idx, (uint8_t)def_spies_rem);
+
+            int16_t actually_lost = def_spies - def_spies_rem;
+            if (actually_lost > 0) {
+                s_MSG msg;
+                memset(&msg, 0, sizeof(s_MSG));
+                msg.msg_type = MSG_TYPE_LOST_DEFENDING_SPY;
+                msg.u.lost_defending_spy.count = actually_lost;
+                MSG_::Add_Msg(msg, player_idx);
+            }
+        }
+    }
+
+    void __cdecl Leader_Assassinates(s_leader_data* leader) {
+        int32_t total_assassins = 0;
+        int32_t total_defenders = 0;
+        int32_t assassin_plr_a = -1;
+        int32_t assassin_plr_b = -1;
+        int16_t victim_player_idx = leader->player_index;
+
+        if (MOX::NUM_PLAYERS > 0) {
+            for (int16_t i = 0; i < MOX::NUM_PLAYERS; i++) {
+                if (i == victim_player_idx) continue;
+                if (MOX::player[i].eliminated != 0) continue;
+
+                int16_t spies_attacking = BILL::Get_Their_Spy_Number(i, victim_player_idx);
+                if (spies_attacking > 0) {
+                    total_assassins += spies_attacking;
+                    if ((int32_t)game_random::Random(total_assassins) <= spies_attacking) {
+                        assassin_plr_a = i;
+                        assassin_plr_b = victim_player_idx;
+                    }
+                }
+
+                if (total_assassins == 0) {
+                    int16_t spies_of_victim_on_i = BILL::Get_Their_Spy_Number(victim_player_idx, i);
+                    if (spies_of_victim_on_i > 0) {
+                        int16_t spies_defending = BILL::Get_Their_Spy_Number(i, i);
+                        if (spies_defending > 0) {
+                            total_defenders += spies_defending;
+                            if ((int32_t)game_random::Random(total_defenders) <= spies_defending) {
+                                assassin_plr_a = i;
+                                assassin_plr_b = i;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if (assassin_plr_a != -1) {
+            s_MSG msg = {};
+            msg.msg_type = MSG_TYPE_SPY_ASSASSINATION;
+            msg.u.spy_assasination.plr_a = (int8_t)assassin_plr_a;
+            msg.u.spy_assasination.plr_b = (int8_t)assassin_plr_b;
+
+            int32_t leader_idx = (int32_t)(leader - MOX::leaders);
+            msg.u.spy_assasination.leader_id = (int8_t)leader_idx;
+            msg.u.spy_assasination.victim_id = (int8_t)victim_player_idx;
+
+            MSG_::Add_Msg(msg, victim_player_idx);
+            MSG_::Add_Msg(msg, (int16_t)assassin_plr_a);
+
+            int16_t spies = BILL::Get_Their_Spy_Number((int16_t)assassin_plr_a, (int16_t)assassin_plr_b);
+            BILL::Set_Their_Spy_Number((int16_t)assassin_plr_a, (int16_t)assassin_plr_b, spies - 1);
+        }
+    }
+
+    void __cdecl Steal_App(s_player* attacker, s_player* victim, int8_t frame_flag) {
+        int32_t attacker_idx = (int32_t)(attacker - MOX::player);
+        int32_t victim_idx = (int32_t)(victim - MOX::player);
+        int32_t chosen_app_id = -1;
+        uint32_t total_cost = 0;
+
+        for (int i = 0; i < 204 /* 0xCC */; ++i) {
+            if (victim->tech_applications[i] == TECH_RESEARCH_STATUS_RESEARCHED) {
+                if (COLCALC::Player_May_Get_Tech_App(attacker, i)) {
+                    int16_t field_id = TECHDATA::technology_applications[i].tech_field_id;
+                    if (field_id != 0 && Current_Research_Allows_Theft(field_id, i, attacker->current_research_field, attacker->current_research_application)) {
+                        uint32_t field_cost = TECHDATA::technology_fields[field_id].cost;
+                        if ((int32_t)field_cost > 0) {
+                            total_cost += field_cost;
+                            if ((uint32_t)game_random::Random(total_cost) <= field_cost) {
+                                chosen_app_id = i;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if (chosen_app_id >= 0) {
+            COLCALC::Player_Gets_Tech_App(attacker, chosen_app_id);
+
+            int16_t framed_player_idx = (int16_t)attacker_idx;
+            if (frame_flag != 0) {
+                spy::Frame_Another((int16_t)attacker_idx, (int16_t)victim_idx, &framed_player_idx, chosen_app_id);
+            }
+
+            int32_t penalty = -((int32_t)game_random::Random(5) + (int32_t)game_random::Random(15));
+            int32_t mode = (framed_player_idx == (int16_t)attacker_idx) ? 1 : 2;
+            diplomac::Change_Relations(penalty, framed_player_idx, victim_idx, mode, 0, chosen_app_id);
+
+            s_report report;
+            memset(&report, 0, sizeof(report));
+
+            report.type = 1; /* MSG_TYPE_STEAL */
+            report.player_idx = (int16_t)attacker_idx;
+            report.action = 0;
+            report.d.steal.victim_player_idx = (uint8_t)victim_idx;
+            if (framed_player_idx == (int16_t)attacker_idx) {
+                report.d.steal.framed_player_idx = -1;
+            } else {
+                report.d.steal.framed_player_idx = (int8_t)framed_player_idx;
+            }
+            report.d.steal.tech_app_id = (int16_t)chosen_app_id;
+            REPORT::Add_Report(&report);
+
+            report.type = 2; /* MSG_TYPE_ENEMY_STEAL */
+            report.player_idx = (int16_t)victim_idx;
+            report.action = 0;
+            report.d.enemy_steal.enemy_player_idx = framed_player_idx;
+            report.d.enemy_steal.tech_app_id = (int16_t)chosen_app_id;
+            REPORT::Add_Report(&report);
+        }
+    }
+
+    int32_t __cdecl N_Spies_Bonus(int32_t spy_count) {
+        if (spy_count <= count_bonus.plus_two) {
+            return spy_count * 2;
+        }
+
+        if (spy_count <= count_bonus.plus_one) {
+            return spy_count + count_bonus.plus_two;
+        }
+
+        // Equivalent to (spy_count - plus_one) / 2 + plus_one + plus_two.
+        return (spy_count - count_bonus.plus_one) / 2 +
+            count_bonus.plus_one + count_bonus.plus_two;
+    }
+
+    /**
+     * Attempts to find a candidate player to "frame" for a spy action.
+     * 
+     * @param player_idx_a The player performing the spy action.
+     * @param player_idx_b The victim player being spied upon.
+     * @param framed_player_idx Output pointer for the player index to be framed.
+     * @param tech_app_id Tech application id to exclude candidates who already know it, or -1.
+     * @return true if any candidates were found, false otherwise.
+     */
+    bool __cdecl Frame_Another(int16_t player_idx_a, int16_t player_idx_b, int16_t* framed_player_idx, int32_t tech_app_id) {
+        int32_t candidate_count = 0;
+        uint8_t treaty_counts[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+        int8_t framed_candidates[8] = {-1, -1, -1, -1, -1, -1, -1, -1};
+
+        for (int32_t i = 0; i < (int32_t)MOX::NUM_PLAYERS; ++i) {
+            // A player cannot frame themselves or the victim they are already spying on
+            if (i == (int32_t)player_idx_a || i == (int32_t)player_idx_b) {
+                continue;
+            }
+
+            // The potential candidate must have contact with both the actor and the victim
+            if (MOX::player[i].contact[player_idx_a] == 0) {
+                continue;
+            }
+
+            if (MOX::player[i].contact[player_idx_b] == 0) {
+                continue;
+            }
+
+            // If a tech application id is provided, ensure the candidate doesn't already know it
+            if (!frame_anyone && tech_app_id != -1) {
+                if (MOX::player[i].tech_applications[tech_app_id] == TECH_RESEARCH_STATUS_RESEARCHED) {
+                    continue;
+                }
+            }
+
+            candidate_count++;
+
+            // Get the treaty level between the actor and the potential frame candidate
+            uint8_t treaty_type = (uint8_t)MOX::player[player_idx_a].treaty[i];
+
+            // Reservoir sampling: select one candidate per treaty category at random
+            treaty_counts[treaty_type]++;
+            if (game_random::Random((int32_t)treaty_counts[treaty_type]) == 1) {
+                framed_candidates[treaty_type] = (int8_t)i;
+            }
+        }
+
+        // Selection priority based on treaty type
+        int8_t selected_idx = -1;
+        if (framed_candidates[6] != -1) {
+            selected_idx = framed_candidates[6];
+        } else if (framed_candidates[5] != -1) {
+            selected_idx = framed_candidates[5];
+        } else if (framed_candidates[4] != -1) {
+            selected_idx = framed_candidates[4];
+        } else if (framed_candidates[0] != -1) {
+            selected_idx = framed_candidates[0];
+        } else if (framed_candidates[1] != -1) {
+            selected_idx = framed_candidates[1];
+        } else if (framed_candidates[3] != -1) {
+            selected_idx = framed_candidates[3];
+        } else if (framed_candidates[2] != -1) {
+            selected_idx = framed_candidates[2];
+        }
+
+        if (selected_idx != -1) {
+            *framed_player_idx = (int16_t)selected_idx;
+        }
+
+        return candidate_count > 0;
+    }
+
+    void __cdecl Destroy_Random_Building(int16_t framed_player_idx, int16_t victim_player_idx, int32_t acting_player_idx) {
+        int16_t target_colony = -1;
+        int32_t target_building = -1;
+        int32_t total_weight = 0;
+
+        for (int16_t i = 0; i < MOX::NUM_COLONIES; ++i) {
+            s_colony* colony = &MOX::colony[i];
+            if (colony->owner == victim_player_idx) {
+                for (int32_t b_idx = 0; b_idx < BUILDING_COUNT; ++b_idx) {
+                    s_tech_building_data* building_data = &TECHDATA::buildings[b_idx];
+
+                    if (b_idx == BUILDING_CAPITOL) {
+                        continue;
+                    }
+
+                    if (colony->buildings[b_idx] != 0) {
+                        int32_t cost = building_data->cost;
+                        total_weight += cost;
+
+                        if ((int32_t)game_random::Random(total_weight) <= cost) {
+                            target_colony = i;
+                            target_building = b_idx;
+                        }
+                    }
+                }
+            }
+        }
+
+        if (target_colony != -1) {
+            ERICNET::Remove_Building(target_colony, (int16_t)target_building);
+
+            int16_t planet_idx = MOX::colony[target_colony].planet;
+            int32_t diplomacy_mode = (framed_player_idx == (int16_t)acting_player_idx) ? 3 : 4;
+
+            int32_t penalty = -((int32_t)game_random::Random(5) + (int32_t)game_random::Random(15));
+            diplomac::Change_Relations((int16_t)penalty, (int16_t)acting_player_idx, victim_player_idx, diplomacy_mode, planet_idx, (int16_t)target_building);
+
+            s_report report;
+            memset(&report, 0, sizeof(report));
+
+            // Report 1: framed player side (Sabotage)
+            report.type = 1;
+            report.player_idx = framed_player_idx;
+            report.action = 1;
+            report.d.sabotage.framed_player_idx = (framed_player_idx == (int16_t)acting_player_idx) ? -1 : (int8_t)acting_player_idx;
+            report.d.sabotage.victim_player_idx = (uint8_t)victim_player_idx;
+            report.d.sabotage.planet_idx = planet_idx;
+            report.d.sabotage.building_id = (uint8_t)target_building;
+            REPORT::Add_Report(&report);
+
+            // Report 2: victim player side (Enemy Sabotage)
+            report.type = 2;
+            report.player_idx = victim_player_idx;
+            report.action = 1;
+            report.d.enemy_sabotage.enemy_player_idx = (int16_t)acting_player_idx;
+            report.d.enemy_sabotage.planet_idx = planet_idx;
+            report.d.enemy_sabotage.building_id = (uint8_t)target_building;
+            REPORT::Add_Report(&report);
+        }
+    }
+
+} // namespace spy
