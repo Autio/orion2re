@@ -1320,17 +1320,17 @@ DOCTEST_TEST_CASE("AI ship design special priorities preserve themed order and b
     config::s_config_write_set writes;
     config::s_cfg_diagnostic diagnostic;
     DOCTEST_REQUIRE(Append_Decoded_(
-        "ai ship_design special_priority c1_bio_weapon 1 item = 25;"
-        "ai ship_design special_priority c1_bio_weapon 1 kind = weapon;"
-        "ai ship_design special_priority c1_capture 2 item = 8;"
-        "ai ship_design special_priority c1_cloaking 3 kind = weapon;"
-        "ai ship_design special_priority c1_beam_defense 4 item = 9;"
-        "ai ship_design special_priority c1_missile_defense 8 item = 33;"
-        "ai ship_design special_priority c1_armor 1 item = 35;"
-        "ai ship_design special_priority c1_shield 2 item = 2;"
-        "ai ship_design special_priority c2_beam_offense 7 item = 5;"
-        "ai ship_design special_priority c3_missile_offense 2 item = 12;"
-        "ai ship_design special_priority c5_special_weapon 3 kind = weapon;",
+        "ai ship_design c1_bio_weapon 1 item = 25;"
+        "ai ship_design c1_bio_weapon 1 kind = weapon;"
+        "ai ship_design c1_capture 2 item = 8;"
+        "ai ship_design c1_cloaking 3 kind = weapon;"
+        "ai ship_design c1_beam_defense 4 item = 9;"
+        "ai ship_design c1_missile_defense 8 item = 33;"
+        "ai ship_design c1_armor 1 item = 35;"
+        "ai ship_design c1_shield 2 item = 2;"
+        "ai ship_design c2_beam_offense 7 item = 5;"
+        "ai ship_design c3_missile_offense 2 item = 12;"
+        "ai ship_design c5_special_weapon 3 kind = weapon;",
         &writes,
         &diagnostic));
     DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
@@ -1360,16 +1360,19 @@ DOCTEST_TEST_CASE("AI ship design special priorities preserve themed order and b
         AI_SPECIAL_ITEM_WEAPON);
 
     const char* paths[] = {
-        "ai.ship_design.special_priority.c1_bio_weapon.1.item",
-        "ai.ship_design.special_priority.c1_capture.2.kind",
-        "ai.ship_design.special_priority.c1_cloaking.3.kind",
-        "ai.ship_design.special_priority.c1_beam_defense.4.item",
-        "ai.ship_design.special_priority.c1_missile_defense.8.item",
-        "ai.ship_design.special_priority.c1_armor.1.item",
-        "ai.ship_design.special_priority.c1_shield.2.item",
-        "ai.ship_design.special_priority.c2_beam_offense.7.item",
-        "ai.ship_design.special_priority.c3_missile_offense.2.item",
-        "ai.ship_design.special_priority.c5_special_weapon.3.kind",
+        "ai.ship_design.c1_bio_weapon.1.item",
+        "ai.ship_design.c1_capture.2.kind",
+        "ai.ship_design.c1_cloaking.3.kind",
+        "ai.ship_design.c1_beam_defense.4.item",
+        "ai.ship_design.c1_missile_defense.8.item",
+        "ai.ship_design.c1_armor.1.item",
+        "ai.ship_design.c1_shield.2.item",
+        "ai.ship_design.c2_beam_offense.7.item",
+        "ai.ship_design.c3_missile_offense.2.item",
+        "ai.ship_design.c5_special_weapon.3.kind",
+        "ai.ship_design.c4_defense_human_non_beams.19.item",
+        "ai.ship_design.c4_defense_human_beams.19.kind",
+        "ai.ship_design.c6_special_device.12.kind",
     };
     for (const char* expected : paths) {
         config::t_variable_id id = config::CONFIG_NO_VARIABLE;
@@ -1381,19 +1384,19 @@ DOCTEST_TEST_CASE("AI ship design special priorities preserve themed order and b
 
     writes.writes.clear();
     DOCTEST_CHECK_FALSE(Append_Decoded_(
-        "ai ship_design special_priority c1_capture 1 item = 256;",
+        "ai ship_design c1_capture 1 item = 256;",
         &writes,
         &diagnostic));
     writes.writes.clear();
     DOCTEST_CHECK_FALSE(Append_Decoded_(
-        "ai ship_design special_priority c1_capture 1 kind = unknown;",
+        "ai ship_design c1_capture 1 kind = unknown;",
         &writes,
         &diagnostic));
 
     writes.writes.clear();
     DOCTEST_REQUIRE(Append_Decoded_(
-        "ai ship_design special_priority c1_capture 1 item = 45;"
-        "ai ship_design special_priority c1_capture 1 kind = special;",
+        "ai ship_design c1_capture 1 item = 45;"
+        "ai ship_design c1_capture 1 kind = special;",
         &writes,
         &diagnostic));
     DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
@@ -1402,8 +1405,8 @@ DOCTEST_TEST_CASE("AI ship design special priorities preserve themed order and b
     DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
     writes.writes.clear();
     DOCTEST_REQUIRE(Append_Decoded_(
-        "ai ship_design special_priority c1_armor 1 item = 45;"
-        "ai ship_design special_priority c1_armor 1 kind = special;",
+        "ai ship_design c1_armor 1 item = 45;"
+        "ai ship_design c1_armor 1 kind = special;",
         &writes,
         &diagnostic));
     DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
@@ -1517,10 +1520,10 @@ DOCTEST_TEST_CASE("AI special-device and defense priorities preserve native defa
     DOCTEST_REQUIRE(Append_Decoded_(
         "ai ship_design c6_special_device 1 item = 35;"
         "ai ship_design c6_special_device 1 kind = special;"
-        "ai ship_design defense_priority c4_defense_human_non_beams 1 item = 33;"
-        "ai ship_design defense_priority c4_defense_human_non_beams 1 kind = weapon;"
-        "ai ship_design defense_priority c4_defense_human_beams 19 item = 29;"
-        "ai ship_design defense_priority c4_defense_human_beams 19 kind = weapon;",
+        "ai ship_design c4_defense_human_non_beams 1 item = 33;"
+        "ai ship_design c4_defense_human_non_beams 1 kind = weapon;"
+        "ai ship_design c4_defense_human_beams 19 item = 29;"
+        "ai ship_design c4_defense_human_beams 19 kind = weapon;",
         &writes,
         &diagnostic));
     DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
@@ -1546,7 +1549,7 @@ DOCTEST_TEST_CASE("AI special-device and defense priorities preserve native defa
         &diagnostic));
     writes.writes.clear();
     DOCTEST_CHECK_FALSE(Append_Decoded_(
-        "ai ship_design defense_priority c4_defense_human_beams 20 item = 1;",
+        "ai ship_design c4_defense_human_beams 20 item = 1;",
         &writes,
         &diagnostic));
 
