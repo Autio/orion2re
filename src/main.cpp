@@ -1,6 +1,9 @@
 #include "pch.h"
 
 #include <SDL3/SDL_main.h>
+#if defined(__APPLE__)
+#include <mach-o/dyld.h>
+#endif
 
 #include "config/config_loader.h"
 #include "lua/lua_mod_runtime.h"
@@ -121,8 +124,31 @@ int main(int argc, char** argv) {
     Configure_Asan_Runtime_();
 #endif
 
-    char* current_directory = SDL_GetCurrentDirectory();
     const char* base_path = SDL_GetBasePath();
+#if defined(__APPLE__)
+    char executable_path[PATH_MAX];
+    uint32_t executable_path_size = sizeof(executable_path);
+    char resolved_path[PATH_MAX];
+    if (_NSGetExecutablePath(executable_path, &executable_path_size) != 0 || realpath(executable_path, resolved_path) == nullptr) {
+        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "main: unable to resolve executable path: %s", strerror(errno));
+        Shutdown_Game_Log_();
+        return -1;
+    }
+    char* filename = strrchr(resolved_path, '/');
+    if (filename == nullptr) {
+        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "main: executable path has no directory: '%s'", resolved_path);
+        Shutdown_Game_Log_();
+        return -1;
+    }
+    filename[1] = '\0';
+    if (chdir(resolved_path) != 0) {
+        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "main: unable to set working directory to '%s': %s", resolved_path, strerror(errno));
+        Shutdown_Game_Log_();
+        return -1;
+    }
+#endif
+
+    char* current_directory = SDL_GetCurrentDirectory();
     const char* vfs_base_path = current_directory != nullptr ? current_directory : base_path;
 
     if (vfs::Init(vfs_base_path) == 0) {

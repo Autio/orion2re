@@ -669,6 +669,27 @@ if(ORION2RE_BUILD_GAME)
             )
         endif()
     endif()
+
+    if(APPLE AND CMAKE_BUILD_TYPE STREQUAL "Release")
+        add_custom_target(orion2re-app ALL DEPENDS orion2re)
+        set(ORION2RE_APP_DIRS "${CMAKE_CURRENT_BINARY_DIR}")
+        if(ORION2RE_GAME_DIR)
+            list(APPEND ORION2RE_APP_DIRS "${ORION2RE_GAME_DIR}")
+        endif()
+        foreach(ORION2RE_APP_DIR IN LISTS ORION2RE_APP_DIRS)
+            set(ORION2RE_APP_CONTENTS "${ORION2RE_APP_DIR}/Orion2 Redone.app/Contents")
+            add_custom_command(TARGET orion2re-app POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E make_directory "${ORION2RE_APP_CONTENTS}/MacOS"
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/orion2re.Info.plist"
+                    "${ORION2RE_APP_CONTENTS}/Info.plist"
+                COMMAND ${CMAKE_COMMAND} -E create_symlink
+                    "../../../$<TARGET_FILE_NAME:orion2re>"
+                    "${ORION2RE_APP_CONTENTS}/MacOS/orion2re"
+                VERBATIM
+            )
+        endforeach()
+    endif()
 endif()
 
 if(ORION2RE_BUILD_CONFIG_TOOL)
