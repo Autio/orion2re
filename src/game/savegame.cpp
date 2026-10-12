@@ -69,12 +69,9 @@ namespace SAVEGAME {
             star->wormhole_star_id = -1;
             star->next_wfi_in_list = -1;
             memset(star->officer_index, 0xFF, sizeof(star->officer_index));
-            for (int16_t& planet_index : star->planet_index) {
-                planet_index = -1;
-            }
-            for (int16_t& relocation : star->relocate_ship_to) {
-                relocation = -1;
-            }
+            // Packed fields: fill bytewise rather than through int16_t&.
+            memset(star->planet_index, 0xFF, sizeof(star->planet_index));
+            memset(star->relocate_ship_to, 0xFF, sizeof(star->relocate_ship_to));
             memset(star->surrender_to, 0xFF, sizeof(star->surrender_to));
         }
 
