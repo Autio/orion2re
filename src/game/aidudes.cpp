@@ -810,8 +810,8 @@ namespace aidudes {
         }
 
         // Tertiary sort: masked raw value comparison
-        uint32_t val1 = *(const uint32_t*)a;
-        uint32_t val2 = *(const uint32_t*)b;
+        uint32_t val1 = POP::Load((const uint32_t*)a);
+        uint32_t val2 = POP::Load((const uint32_t*)b);
 
         return (int)POP::Get_Race(val1) - (int)POP::Get_Race(val2);
     }
@@ -1552,7 +1552,7 @@ namespace aidudes {
         int16_t base_production = COLCALC::Colony_Pop_Prod_Produced(colony, flags, 0);
         int worthiness;
 
-        if (POP::Is_Worker(*flags)) {
+        if (POP::Is_Worker(POP::Load(flags))) {
             int16_t mode1_production = COLCALC::Colony_Pop_Prod_Produced(colony, flags, 1);
             worthiness = (int)base_production - (int)mode1_production;
 
@@ -1624,7 +1624,7 @@ namespace aidudes {
         }
 
         if (p2_prod1 == p1_prod1) {
-            return (int)(*(const uint32_t*)p1 & 0xF) - (int)(*(const uint32_t*)p2 & 0xF);
+            return (int)(POP::Load((const uint32_t*)p1) & 0xF) - (int)(POP::Load((const uint32_t*)p2) & 0xF);
         }
 
         return (int)p1_prod1 - (int)p2_prod1;
