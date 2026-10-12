@@ -53,7 +53,7 @@ namespace aidudes {
                 for (int j = (int)info->pop_tail_idx - 1; j >= (int)info->first_assignable_pop_idx; --j) {
                     uint32_t* pop_entry = &col->pop[j];
 
-                    if (!POP::Is_Worker(*pop_entry)) {
+                    if (!POP::Is_Worker(POP::Load(pop_entry))) {
                         break;
                     }
 
@@ -543,10 +543,10 @@ namespace aidudes {
 
         s_colony& colony = MOX::colony[colony_idx];
 
-        uint32_t& pop_flags = colony.pop[cur_pop_idx];
+        uint32_t* pop_flags = &colony.pop[cur_pop_idx];
 
-        POP::Set_Prof(&pop_flags, POP::PROF_SCIENTIST);
-        POP::Set_Assigned(&pop_flags, true);
+        POP::Set_Prof(pop_flags, POP::PROF_SCIENTIST);
+        POP::Set_Assigned(pop_flags, true);
 
         colony_info->cur_pop_idx = cur_pop_idx + 1;
 
@@ -558,10 +558,10 @@ namespace aidudes {
 
         info->pop_end_idx--;
 
-        uint32_t& pop_record = colony->pop[(uint8_t)info->pop_end_idx];
+        uint32_t* pop_record = &colony->pop[(uint8_t)info->pop_end_idx];
 
-        POP::Set_Prof(&pop_record, POP::PROF_WORKER);
-        POP::Set_Assigned(&pop_record, true);
+        POP::Set_Prof(pop_record, POP::PROF_WORKER);
+        POP::Set_Assigned(pop_record, true);
 
         Compute_Max_Min_R_I_Worthiness(info);
     }
@@ -624,9 +624,9 @@ namespace aidudes {
         POP::e_prof prof = is_researching == 0 ? POP::PROF_WORKER : POP::PROF_SCIENTIST;
 
         while ((uint8_t)colony_info->cur_pop_idx < (uint8_t)colony_info->pop_end_idx) {
-            uint32_t& pop = colony->pop[(uint8_t)colony_info->cur_pop_idx];
-            POP::Set_Prof(&pop, prof);
-            POP::Set_Assigned(&pop, true);
+            uint32_t* pop = &colony->pop[(uint8_t)colony_info->cur_pop_idx];
+            POP::Set_Prof(pop, prof);
+            POP::Set_Assigned(pop, true);
             colony_info->cur_pop_idx++;
         }
     }
@@ -655,9 +655,9 @@ namespace aidudes {
 
                 if (total_food_needed > colony->production[0] * 2) {
                     if ((uint8_t)colony_info->n_farmers < (uint8_t)colony->max_farms) {
-                        uint32_t& pop = colony->pop[(uint8_t)colony_info->cur_pop_idx];
-                        POP::Set_Prof(&pop, POP::PROF_FARMER);
-                        POP::Set_Assigned(&pop, true);
+                        uint32_t* pop = &colony->pop[(uint8_t)colony_info->cur_pop_idx];
+                        POP::Set_Prof(pop, POP::PROF_FARMER);
+                        POP::Set_Assigned(pop, true);
                         colony_info->cur_pop_idx++;
                         colony_info->n_farmers++;
                     } else if (colony->food2_per_farmer == 0) {
@@ -666,9 +666,9 @@ namespace aidudes {
                     }
                 } else {
                     colony_info->pop_end_idx--;
-                    uint32_t& pop = colony->pop[(uint8_t)colony_info->pop_end_idx];
-                    POP::Set_Prof(&pop, POP::PROF_WORKER);
-                    POP::Set_Assigned(&pop, true);
+                    uint32_t* pop = &colony->pop[(uint8_t)colony_info->pop_end_idx];
+                    POP::Set_Prof(pop, POP::PROF_WORKER);
+                    POP::Set_Assigned(pop, true);
                 }
                 COLCALC::Pre_Import_Computing(colony);
             }
@@ -716,7 +716,7 @@ namespace aidudes {
         colony_info->n_workers = 0;
 
         for (int i = 0; i < (int)colony->n_pops; ++i) {
-            uint32_t pop_entry = pop_ptr[i];
+            uint32_t pop_entry = POP::Load(&pop_ptr[i]);
             uint32_t race_idx = POP::Get_Race(pop_entry);
 
             if (POP::Is_Android_Or_Native(pop_entry)) {
@@ -737,7 +737,7 @@ namespace aidudes {
             }
 
             // Re-evaluate current pop entry state after potential modifications
-            uint32_t current_pop = pop_ptr[i];
+            uint32_t current_pop = POP::Load(&pop_ptr[i]);
             uint32_t current_race = POP::Get_Race(current_pop);
 
             // Check if population is affected by pollution (not Android/Native and not Tolerant)
@@ -770,14 +770,14 @@ namespace aidudes {
         const uint32_t* pop1 = (const uint32_t*)a;
         const uint32_t* pop2 = (const uint32_t*)b;
         uint8_t flag1 = 0;
-        uint32_t val1 = POP::Get_Race(*pop1);
+        uint32_t val1 = POP::Get_Race(POP::Load(pop1));
 
         if (val1 == POP::RACE_ANDROID || val1 == POP::RACE_NATIVE) {
             flag1 = 1;
         }
 
         uint8_t flag2 = 0;
-        uint32_t val2 = POP::Get_Race(*pop2);
+        uint32_t val2 = POP::Get_Race(POP::Load(pop2));
 
         if (val2 == POP::RACE_ANDROID || val2 == POP::RACE_NATIVE) {
             flag2 = 1;
@@ -1390,7 +1390,7 @@ namespace aidudes {
         int prod2 = (int)COLCALC::Colony_Pop_Prod_Produced(Sort_Pops_colony_data, pop2, 0);
 
         int score1;
-        if (POP::Is_Worker(*pop1)) {
+        if (POP::Is_Worker(POP::Load(pop1))) {
             score1 = prod1 - (int)COLCALC::Colony_Pop_Prod_Produced(Sort_Pops_colony_data, pop1, 1);
             if (Sort_Pops_colony_info->pollution_at_start < Sort_Pops_colony_data->pollution) {
                 score1 += 1000;
@@ -1400,7 +1400,7 @@ namespace aidudes {
         }
 
         int score2;
-        if (POP::Is_Worker(*pop2)) {
+        if (POP::Is_Worker(POP::Load(pop2))) {
             score2 = prod2 - (int)COLCALC::Colony_Pop_Prod_Produced(Sort_Pops_colony_data, pop2, 1);
             if (Sort_Pops_colony_info->pollution_at_start < Sort_Pops_colony_data->pollution) {
                 score2 += 1000;
@@ -1417,8 +1417,8 @@ namespace aidudes {
             return prod1 - prod2;
         }
 
-        uint32_t val1 = *pop1;
-        uint32_t val2 = *pop2;
+        uint32_t val1 = POP::Load(pop1);
+        uint32_t val2 = POP::Load(pop2);
 
         if (POP::Get_Prof(val1) == POP::Get_Prof(val2)) {
             return (int)POP::Get_Race(val1) - (int)POP::Get_Race(val2);
@@ -1431,9 +1431,9 @@ namespace aidudes {
         s_colony* colony = &MOX::colony[info->colony_idx];
         int16_t old_pollution = colony->pollution;
 
-        uint32_t& pop = colony->pop[(uint8_t)info->cur_pop_idx];
-        POP::Set_Prof(&pop, POP::PROF_FARMER);
-        POP::Set_Assigned(&pop, true);
+        uint32_t* pop = &colony->pop[(uint8_t)info->cur_pop_idx];
+        POP::Set_Prof(pop, POP::PROF_FARMER);
+        POP::Set_Assigned(pop, true);
 
         info->cur_pop_idx++;
         info->n_farmers++;
@@ -1607,7 +1607,7 @@ namespace aidudes {
             return (int32_t)prod_1_p1 - (int32_t)prod_1_p2;
         }
 
-        return (int)(*pop1 & 0x0F) - (int)(*pop2 & 0x0F);
+        return (int)(POP::Load(pop1) & 0x0F) - (int)(POP::Load(pop2) & 0x0F);
     }
 
     int __cdecl Sort_Pops_R_I(const void* p1, const void* p2) {

@@ -1503,7 +1503,7 @@ namespace COLCALC {
     }
 
     int16_t __cdecl Colony_Pop_Prod_Produced(const s_colony* colony, const uint32_t* pop_unit, int16_t mode) {
-        uint32_t pop_mask = *pop_unit;
+        uint32_t pop_mask = POP::Load(pop_unit);
 
         // Call the empire-specific base production function
         int16_t base_prod = colony_empire_base_functions[mode](
@@ -1540,7 +1540,7 @@ namespace COLCALC {
         base_produced = colony_empire_base_functions[job_type](
             colony,
             static_cast<int16_t>(colony->owner),
-            (int16_t)(*pop & 0x0000000f),
+            (int16_t)(POP::Load(pop) & 0x0000000f),
             out);
 
         if (base_produced < 1) {
@@ -2182,7 +2182,7 @@ namespace COLCALC {
             for (int32_t i = 0; i < pop_count; ++i) {
                 uint32_t* pop = &colony->pop[i];
 
-                if (COLONY::Colony_Pop_Is_Annihilation_Target(colony, *pop)) {
+                if (COLONY::Colony_Pop_Is_Annihilation_Target(colony, POP::Load(pop))) {
                     ++removable_count;
                     if (game_random::Random(removable_count) == 1) {
                         selected_pop = pop;
@@ -2200,13 +2200,13 @@ namespace COLCALC {
                     msg.msg_type = MSG_TYPE_COLONY;
                     msg.u.colony.planet_idx = colony->planet;
                     msg.u.colony.subtype = MSG_COLONY_SUBTYPE_GENOCIDE;
-                    msg.u.colony.c.assimilation.val = static_cast<uint8_t>(*selected_pop & 0x0f);
+                    msg.u.colony.c.assimilation.val = static_cast<uint8_t>(POP::Load(selected_pop) & 0x0f);
 
                     MSG_::Add_Msg(msg, static_cast<int16_t>(static_cast<int8_t>(colony->owner)));
                 }
 
                 --colony->n_pops;
-                *selected_pop = colony->pop[static_cast<uint8_t>(colony->n_pops)];
+                POP::Store(selected_pop, colony->pop[static_cast<uint8_t>(colony->n_pops)]);
             }
         }
 
@@ -3318,7 +3318,7 @@ namespace COLCALC {
         uint32_t* pop_end = colony->pop + static_cast<uint8_t>(colony->n_pops);
 
         while (pop < pop_end) {
-            if ((*pop & 0xF) == empire_id) {
+            if ((POP::Load(pop) & 0xF) == empire_id) {
                 ++pop_count;
             }
             ++pop;
@@ -3813,7 +3813,7 @@ namespace COLCALC {
                                     uint32_t* pop_end = &colony->pop[static_cast<uint8_t>(colony->n_pops)];
 
                                     while (pop_ptr < pop_end) {
-                                        const uint32_t pop_value = *pop_ptr;
+                                        const uint32_t pop_value = POP::Load(pop_ptr);
                                         const uint32_t pop_type = pop_value & 0x0F;
 
                                         if (pop_type == 9) {
@@ -3850,13 +3850,13 @@ namespace COLCALC {
                                         pop_removed_msg.u.colony.planet_idx = colony->planet;
                                         pop_removed_msg.u.colony.subtype = MSG_COLONY_SUBTYPE_ANDROID_KILLED_ORGANIC;
                                         pop_removed_msg.u.colony.c.android_killed.race_idx =
-                                            static_cast<int8_t>(*selected_pop & 0x0F);
+                                            static_cast<int8_t>(POP::Load(selected_pop) & 0x0F);
                                         MSG_::Add_Msg(pop_removed_msg, static_cast<int16_t>(owner_player_idx));
 
                                         const uint8_t last_pop_index =
                                             static_cast<uint8_t>(static_cast<uint8_t>(colony->n_pops) - 1);
                                         colony->n_pops = last_pop_index;
-                                        *selected_pop = colony->pop[last_pop_index];
+                                        POP::Store(selected_pop, colony->pop[last_pop_index]);
                                         removed_existing_pop = true;
                                     }
                                 }
