@@ -190,49 +190,95 @@ namespace config {
             return CONFIG_NO_NODE;
         }
 
+        // Config targets may live inside packed structures, so copy values
+        // bytewise rather than through typed pointers.
         bool Read_Integer(const void* address, e_value_type type, int64_t* value) {
             switch (type) {
-                case CONFIG_VALUE_BOOL: *value = *(const uint8_t*)address; return true;
-                case CONFIG_VALUE_INT8: *value = *(const int8_t*)address; return true;
-                case CONFIG_VALUE_UINT8: *value = *(const uint8_t*)address; return true;
-                case CONFIG_VALUE_INT16: *value = *(const int16_t*)address; return true;
-                case CONFIG_VALUE_UINT16: *value = *(const uint16_t*)address; return true;
-                case CONFIG_VALUE_INT32: *value = *(const int32_t*)address; return true;
-                case CONFIG_VALUE_UINT32: *value = *(const uint32_t*)address; return true;
+                case CONFIG_VALUE_BOOL:
+                case CONFIG_VALUE_UINT8: {
+                    uint8_t v;
+                    memcpy(&v, address, sizeof(v));
+                    *value = v;
+                    return true;
+                }
+                case CONFIG_VALUE_INT8: {
+                    int8_t v;
+                    memcpy(&v, address, sizeof(v));
+                    *value = v;
+                    return true;
+                }
+                case CONFIG_VALUE_INT16: {
+                    int16_t v;
+                    memcpy(&v, address, sizeof(v));
+                    *value = v;
+                    return true;
+                }
+                case CONFIG_VALUE_UINT16: {
+                    uint16_t v;
+                    memcpy(&v, address, sizeof(v));
+                    *value = v;
+                    return true;
+                }
+                case CONFIG_VALUE_INT32: {
+                    int32_t v;
+                    memcpy(&v, address, sizeof(v));
+                    *value = v;
+                    return true;
+                }
+                case CONFIG_VALUE_UINT32: {
+                    uint32_t v;
+                    memcpy(&v, address, sizeof(v));
+                    *value = v;
+                    return true;
+                }
                 default: return false;
             }
         }
 
         bool Write_Integer(void* address, size_t size, e_value_type type, int64_t value) {
             switch (type) {
-                case CONFIG_VALUE_BOOL:
+                case CONFIG_VALUE_BOOL: {
                     if (size != sizeof(uint8_t)) return false;
-                    *(uint8_t*)address = (uint8_t)(value != 0);
+                    uint8_t v = (uint8_t)(value != 0);
+                    memcpy(address, &v, sizeof(v));
                     return true;
-                case CONFIG_VALUE_INT8:
+                }
+                case CONFIG_VALUE_INT8: {
                     if (size != sizeof(int8_t)) return false;
-                    *(int8_t*)address = (int8_t)value;
+                    int8_t v = (int8_t)value;
+                    memcpy(address, &v, sizeof(v));
                     return true;
-                case CONFIG_VALUE_UINT8:
+                }
+                case CONFIG_VALUE_UINT8: {
                     if (size != sizeof(uint8_t)) return false;
-                    *(uint8_t*)address = (uint8_t)value;
+                    uint8_t v = (uint8_t)value;
+                    memcpy(address, &v, sizeof(v));
                     return true;
-                case CONFIG_VALUE_INT16:
+                }
+                case CONFIG_VALUE_INT16: {
                     if (size != sizeof(int16_t)) return false;
-                    *(int16_t*)address = (int16_t)value;
+                    int16_t v = (int16_t)value;
+                    memcpy(address, &v, sizeof(v));
                     return true;
-                case CONFIG_VALUE_UINT16:
+                }
+                case CONFIG_VALUE_UINT16: {
                     if (size != sizeof(uint16_t)) return false;
-                    *(uint16_t*)address = (uint16_t)value;
+                    uint16_t v = (uint16_t)value;
+                    memcpy(address, &v, sizeof(v));
                     return true;
-                case CONFIG_VALUE_INT32:
+                }
+                case CONFIG_VALUE_INT32: {
                     if (size != sizeof(int32_t)) return false;
-                    *(int32_t*)address = (int32_t)value;
+                    int32_t v = (int32_t)value;
+                    memcpy(address, &v, sizeof(v));
                     return true;
-                case CONFIG_VALUE_UINT32:
+                }
+                case CONFIG_VALUE_UINT32: {
                     if (size != sizeof(uint32_t)) return false;
-                    *(uint32_t*)address = (uint32_t)value;
+                    uint32_t v = (uint32_t)value;
+                    memcpy(address, &v, sizeof(v));
                     return true;
+                }
                 default: return false;
             }
         }
