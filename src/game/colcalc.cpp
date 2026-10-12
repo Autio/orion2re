@@ -765,10 +765,9 @@ namespace COLCALC {
         int16_t total_production = 0;
         int16_t max_production = 0;
         int16_t best_index = 0;
-        int16_t* production = colony->production;
 
         for (int16_t i = 0; i < ECON_BC; ++i) {
-            int16_t current_val = production[i];
+            int16_t current_val = colony->production[i];
             total_production += current_val;
 
             if (current_val > max_production) {
