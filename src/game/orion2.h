@@ -1,3 +1,4 @@
+#include <cstddef>
 #include <cstring>
 
 #pragma pack(push, 1)
@@ -1936,6 +1937,15 @@ struct s_player {
     int32_t tribute_income;
     int8_t filler[45];
 };
+
+// Reads a player's research status for a technology field. Application 125
+// has field TECH_FIELD_INVALID (-1), and the original game indexed
+// tech_fields with it unchecked, reading the preceding byte of s_player (the
+// high byte of maintenance[5]). Reproduce that read without indexing the
+// array out of bounds.
+inline uint8_t Player_Tech_Field_Status_(const s_player* player, int16_t tech_field_id) {
+    return reinterpret_cast<const uint8_t*>(player)[offsetof(s_player, tech_fields) + tech_field_id];
+}
 
 struct s_net_pack_drop_out_info {
     struct s_player player_data;
