@@ -2,6 +2,7 @@
 
 #include <exception>
 #include "config/config_loader.h"
+#include "game/config_refresh.h"
 
 namespace ALLOC = allocate;
 
@@ -35,6 +36,17 @@ namespace MOX2 {
             MOX::global_esc = 0;
             int16_t current_screen = MOX::current_screen;
 
+            if (current_screen == SCREEN_MAIN_MENU) {
+                config::s_cfg_diagnostic diagnostic;
+                if (!config::Restore_Launch_Config(&diagnostic)) {
+                    exitm::Exit_With_Message(diagnostic.message.c_str());
+                }
+                CONFIG_REFRESH::Request_Resource_Reload();
+            }
+            if (current_screen != SCREEN_EXIT) {
+                CONFIG_REFRESH::Reload_Resources_Between_Screens();
+            }
+
             switch (current_screen) {
                 case SCREEN_MAIN:
                     MAINSCR::Main_Screen();
@@ -67,12 +79,6 @@ namespace MOX2 {
                     MOX::previous_screen = SCREEN_INFO;
                     break;
                 case SCREEN_MAIN_MENU:
-                    {
-                        config::s_cfg_diagnostic diagnostic;
-                        if (!config::Restore_Launch_Config(&diagnostic)) {
-                            exitm::Exit_With_Message(diagnostic.message.c_str());
-                        }
-                    }
                     MAINMENU::Main_Menu_Screen();
                     MOX::previous_screen = SCREEN_MAIN_MENU;
                     break;
@@ -362,6 +368,7 @@ namespace MOX2 {
         RUSS::Mox_Sync_Update();
         LOADER::Load_Pictures();
         strings::Load_Strings();
+        CONFIG_REFRESH::Resources_Loaded();
         RUSS::Mox_Update();
         MOX::temp_string[0] = 0;
         SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "mox2: assets and strings loaded");
@@ -370,12 +377,12 @@ namespace MOX2 {
             s_player* player = &MOX::player[MOX::PLAYER_NUM];
             if (FILEDEF::Read_Moo_Custom_Player_Data(player)) {
                 if (INITGAME::Init_New_Game(
-                    MOX::settings.game_difficulty,
-                    MOX::settings.galaxy_size,
-                    MOX::settings.galaxy_age,
-                    NEWGAME::Player_Count_For_Initialization(),
-                    MOX::settings.strategic_combat_flag,
-                    MOX::settings.starting_civilization_level)) {
+                        MOX::settings.game_difficulty,
+                        MOX::settings.galaxy_size,
+                        MOX::settings.galaxy_age,
+                        NEWGAME::Player_Count_For_Initialization(),
+                        MOX::settings.strategic_combat_flag,
+                        MOX::settings.starting_civilization_level)) {
                     MOX::current_screen = SCREEN_REPORTS;
                 } else {
                     MOX::current_screen = SCREEN_MAIN_MENU;
@@ -439,6 +446,8 @@ namespace MOX2 {
         }
 
         sound::Destroy_Sound();
+        CONFIG_REFRESH::Resources_Unloaded();
+        LOADER::Free_Pictures();
         netcode::Net_Uninit();
 
         if (!platform::Exit_Requested()) {
