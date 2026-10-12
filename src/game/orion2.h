@@ -1,3 +1,5 @@
+#include <cstring>
+
 #pragma pack(push, 1)
 
 typedef struct s_adv_civ_player s_adv_civ_player, *Ps_adv_civ_player;
@@ -243,20 +245,33 @@ struct s_animation_header {
     undefined1 flags;
 };
 
-inline uint32_t* Animation_Frame_Offsets_(s_animation_header* header) {
-    return reinterpret_cast<uint32_t*>(reinterpret_cast<uint8_t*>(header) + sizeof(s_animation_header));
+// The frame offset table follows the header as uint32_t entries, but
+// animations are loaded at arbitrary addresses, so the table has no
+// alignment guarantee. Access entries only through these helpers.
+inline uint8_t* Animation_Frame_Table_(s_animation_header* header) {
+    return reinterpret_cast<uint8_t*>(header) + sizeof(s_animation_header);
 }
 
-inline const uint32_t* Animation_Frame_Offsets_(const s_animation_header* header) {
-    return reinterpret_cast<const uint32_t*>(reinterpret_cast<const uint8_t*>(header) + sizeof(s_animation_header));
+inline const uint8_t* Animation_Frame_Table_(const s_animation_header* header) {
+    return reinterpret_cast<const uint8_t*>(header) + sizeof(s_animation_header);
+}
+
+inline uint32_t Animation_Frame_Offset_(const s_animation_header* header, int32_t frame) {
+    uint32_t offset;
+    memcpy(&offset, Animation_Frame_Table_(header) + frame * sizeof(uint32_t), sizeof(offset));
+    return offset;
+}
+
+inline void Set_Animation_Frame_Offset_(s_animation_header* header, int32_t frame, uint32_t offset) {
+    memcpy(Animation_Frame_Table_(header) + frame * sizeof(uint32_t), &offset, sizeof(offset));
 }
 
 inline uint8_t* Animation_Frame_Data_(s_animation_header* header, int32_t frame) {
-    return reinterpret_cast<uint8_t*>(header) + Animation_Frame_Offsets_(header)[frame];
+    return reinterpret_cast<uint8_t*>(header) + Animation_Frame_Offset_(header, frame);
 }
 
 inline const uint8_t* Animation_Frame_Data_(const s_animation_header* header, int32_t frame) {
-    return reinterpret_cast<const uint8_t*>(header) + Animation_Frame_Offsets_(header)[frame];
+    return reinterpret_cast<const uint8_t*>(header) + Animation_Frame_Offset_(header, frame);
 }
 
 typedef struct s_antaran s_antaran, *Ps_antaran;
@@ -3139,11 +3154,11 @@ struct s_palette_header {
 };
 
 inline s_palette_header* Animation_Palette_Header_(s_animation_header* header) {
-    return reinterpret_cast<s_palette_header*>(Animation_Frame_Offsets_(header) + header->frame_count + 1);
+    return reinterpret_cast<s_palette_header*>(Animation_Frame_Table_(header) + (header->frame_count + 1) * sizeof(uint32_t));
 }
 
 inline const s_palette_header* Animation_Palette_Header_(const s_animation_header* header) {
-    return reinterpret_cast<const s_palette_header*>(Animation_Frame_Offsets_(header) + header->frame_count + 1);
+    return reinterpret_cast<const s_palette_header*>(Animation_Frame_Table_(header) + (header->frame_count + 1) * sizeof(uint32_t));
 }
 
 struct s_packed_frame_header {

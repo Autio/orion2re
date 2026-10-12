@@ -3007,11 +3007,9 @@ namespace CMBTDRW1 {
         int frame = progress % 16;
         animate::Set_Animation_Frame(MOX::darken_plasma_map, frame);
 
-        const uint32_t* darken_frame_offsets = Animation_Frame_Offsets_(MOX::darken_plasma_map);
-        uint8_t* darken_data = (uint8_t*)MOX::darken_plasma_map + darken_frame_offsets[MOX::darken_plasma_map->current_frame];
+        uint8_t* darken_data = (uint8_t*)MOX::darken_plasma_map + Animation_Frame_Offset_(MOX::darken_plasma_map, MOX::darken_plasma_map->current_frame);
 
-        const uint32_t* bitmap_frame_offsets = Animation_Frame_Offsets_(bitmap);
-        uint8_t* bitmap_data = (uint8_t*)bitmap + bitmap_frame_offsets[bitmap->current_frame];
+        uint8_t* bitmap_data = (uint8_t*)bitmap + Animation_Frame_Offset_(bitmap, bitmap->current_frame);
 
         int16_t darkness = 0;
         switch (mode) {
