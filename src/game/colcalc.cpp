@@ -3862,8 +3862,7 @@ namespace COLCALC {
                                 }
 
                                 if (can_add_pop) {
-                                    uint32_t& new_pop = colony->pop[static_cast<uint8_t>(colony->n_pops)];
-                                    new_pop = 0;
+                                    uint32_t new_pop = 0;
                                     new_pop |= 0x200;
                                     new_pop = (new_pop & 0xFFFFFFF8u) | 0x8u;
                                     new_pop = ((((static_cast<uint32_t>(owner_player_idx) << 4) ^ new_pop) & 0x70u) ^ new_pop);
@@ -3876,6 +3875,7 @@ namespace COLCALC {
                                         new_pop &= 0xFFFFFE7Fu;
                                     }
 
+                                    colony->pop[static_cast<uint8_t>(colony->n_pops)] = new_pop;
                                     colony->n_pops = static_cast<uint8_t>(colony->n_pops + 1);
                                 } else {
                                     s_MSG pop_failed_msg{};

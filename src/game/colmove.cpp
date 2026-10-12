@@ -40,10 +40,10 @@ namespace COLMOVE {
         int16_t unemployed_idx = Get_First_Unemployed(cluster_colony_n);
 
         while (unemployed_idx != -1) {
-            uint32_t& pop_flags = MOX::colony[cluster_colony_n].pop[unemployed_idx];
+            uint32_t* pop_flags = &MOX::colony[cluster_colony_n].pop[unemployed_idx];
 
-            if ((pop_flags & 0x200) == 0) {
-                pop_flags |= 0x200;
+            if (!POP::Is_Assigned(POP::Load(pop_flags))) {
+                POP::Set_Assigned(pop_flags, true);
             }
 
             unemployed_idx = Get_First_Unemployed(cluster_colony_n);
@@ -159,11 +159,11 @@ namespace COLMOVE {
 
         while (unemployed_pop_idx != -1) {
             if (colony_idx == COLMOVE::cluster_colony_n) {
-                uint32_t& pop_flags = MOX::colony[COLMOVE::cluster_colony_n].pop[unemployed_pop_idx];
-                const int32_t current_job = (int32_t)((pop_flags & 0x180u) >> 7);
+                uint32_t* pop_flags = &MOX::colony[COLMOVE::cluster_colony_n].pop[unemployed_pop_idx];
+                const int32_t current_job = (int32_t)POP::Get_Prof(POP::Load(pop_flags));
 
                 if (requested_job == -1 || current_job == requested_job) {
-                    pop_flags |= 0x200u;
+                    POP::Set_Assigned(pop_flags, true);
                 } else {
                     if (COLMOVE::Give_Colonist_New_Job(
                             COLMOVE::cluster_colony_n,
@@ -255,8 +255,8 @@ namespace COLMOVE {
                             extra_success_notice = true;
                         }
 
-                        uint32_t& pop_flags = source_colony->pop[unemployed_pop_idx];
-                        const int32_t current_job = (int32_t)((pop_flags & 0x180u) >> 7);
+                        uint32_t* pop_flags = &source_colony->pop[unemployed_pop_idx];
+                        const int32_t current_job = (int32_t)POP::Get_Prof(POP::Load(pop_flags));
 
                         if (requested_job != -1 && current_job != requested_job) {
                             if (COLMOVE::Give_Colonist_New_Job(
@@ -268,7 +268,7 @@ namespace COLMOVE {
                             }
 
                             extra_success_notice = true;
-                            pop_flags &= 0xFFFFFDFFu;
+                            POP::Set_Assigned(pop_flags, false);
                         }
 
                         SETTLER::Settle_Pop(source_colony, unemployed_pop_idx, destination_colony);
