@@ -759,10 +759,12 @@ DOCTEST_TEST_CASE("150i multiplayer initializes config Lua and negotiated state 
         const int16_t local = NETSTART::Assign_New_Game_Network_Roster_(
             players, &start, users, 2, 202);
         DOCTEST_REQUIRE(local == 1);
+        // Player and start records are packed; double parentheses keep
+        // doctest from binding references to their misaligned members.
         for (int index = 0; index < MAX_PLAYERS; ++index) {
-            DOCTEST_CHECK(players[index].network_player_id ==
-                (index < 2 ? users[index] : -1));
-            DOCTEST_CHECK(start.net_ids[index] == (index < 2 ? users[index] : 0));
+            DOCTEST_CHECK((players[index].network_player_id ==
+                (index < 2 ? users[index] : -1)));
+            DOCTEST_CHECK((start.net_ids[index] == (index < 2 ? users[index] : 0)));
         }
 
         std::vector<uint8_t> offer_bytes(LUA_NETWORK_MAX_BYTES);
@@ -992,25 +994,27 @@ void Check_ICE_Source_Package_(const char* package_id,
         SPECIAL_REFLECTION_FIELD);
     DOCTEST_CHECK(aidesign::ship_design.defense_priority.human_beams[9].id ==
         SPECIAL_LIGHTNING_FIELD);
+    // Ship templates are packed; double parentheses keep doctest from
+    // binding references to their misaligned members.
     for (int difficulty = GAME_DIFFICULTY_TUTOR;
          difficulty <= GAME_DIFFICULTY_IMPOSSIBLE;
          ++difficulty) {
         for (int hull = SHIP_SIZE_SMALL; hull <= SHIP_SIZE_TITAN; ++hull) {
             DOCTEST_CHECK(
-                SHIP_CONFIG::antaran_offensive_templates[difficulty][hull]
-                    .ftl_type == DRIVE_INTERPHASED_DRIVE);
+                (SHIP_CONFIG::antaran_offensive_templates[difficulty][hull]
+                    .ftl_type == DRIVE_INTERPHASED_DRIVE));
             DOCTEST_CHECK(
-                SHIP_CONFIG::antaran_defensive_templates[difficulty][hull]
-                    .ftl_type == DRIVE_INTERPHASED_DRIVE);
+                (SHIP_CONFIG::antaran_defensive_templates[difficulty][hull]
+                    .ftl_type == DRIVE_INTERPHASED_DRIVE));
         }
     }
     s_ship_design& defensive_titan =
         SHIP_CONFIG::antaran_defensive_templates
             [GAME_DIFFICULTY_IMPOSSIBLE][SHIP_SIZE_TITAN];
-    DOCTEST_CHECK(defensive_titan.ship_weapon[3].specials ==
-        WEAPON_MOD_FLAG_POINT_DEFENSE);
-    DOCTEST_CHECK(defensive_titan.ship_weapon[3].count ==
-        (std::strcmp(package_id, "ice-x") == 0 ? 30 : 20));
+    DOCTEST_CHECK((defensive_titan.ship_weapon[3].specials ==
+        WEAPON_MOD_FLAG_POINT_DEFENSE));
+    DOCTEST_CHECK((defensive_titan.ship_weapon[3].count ==
+        (std::strcmp(package_id, "ice-x") == 0 ? 30 : 20)));
     s_ship_design& defensive_frigate =
         SHIP_CONFIG::antaran_defensive_templates
             [GAME_DIFFICULTY_IMPOSSIBLE][SHIP_SIZE_SMALL];
@@ -1022,14 +1026,14 @@ void Check_ICE_Source_Package_(const char* package_id,
     DOCTEST_CHECK(has_special(std::strcmp(package_id, "ice-x") == 0
             ? SPECIAL_WARP_DISSIPATOR
             : SPECIAL_ECM_JAMMER));
-    DOCTEST_CHECK(SHIP_CONFIG::antaran_fortress.primary_weapons[0]
-                      .space_mods == WEAPON_MOD_FLAG_HEAVY_MOUNT);
-    DOCTEST_CHECK(SHIP_CONFIG::antaran_fortress.primary_weapons[2]
-                      .space_mods == WEAPON_MOD_FLAG_POINT_DEFENSE);
-    DOCTEST_CHECK(SHIP_CONFIG::antaran_fortress.specials[5] ==
+    DOCTEST_CHECK((SHIP_CONFIG::antaran_fortress.primary_weapons[0]
+                      .space_mods == WEAPON_MOD_FLAG_HEAVY_MOUNT));
+    DOCTEST_CHECK((SHIP_CONFIG::antaran_fortress.primary_weapons[2]
+                      .space_mods == WEAPON_MOD_FLAG_POINT_DEFENSE));
+    DOCTEST_CHECK((SHIP_CONFIG::antaran_fortress.specials[5] ==
         (std::strcmp(package_id, "ice-x") == 0
                 ? SPECIAL_SUB_SPACE_TELEPORTER
-                : SPECIAL_REINFORCED_HULL));
+                : SPECIAL_REINFORCED_HULL)));
     DOCTEST_REQUIRE(orion2re::lua::Get_Mod_Runtime_Count(
                         orion2re::lua::Get_Active_Mod_Runtimes()) == 1);
     DOCTEST_CHECK(orion2re::lua::Find_Mod_Runtime(
