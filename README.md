@@ -2,6 +2,8 @@
 
 This project is a restoration effort for the Master of Orion II game engine. Check our [documentation portal](https://moo2mod.com/redone/doc/) too.
 
+The game is fully playable, equivalent to last official 1.31 patch and includes all community improvements up to the latest version of the 1.50 community patch. 
+
 All rights to Master of Orion II, its assets, trademarks, and related intellectual property belong to their corresponding owners.
 
 This repository does not include the original game data. To play, you must own a legitimate copy of Master of Orion II and provide the original game files from a supported release such as GOG or Steam.
