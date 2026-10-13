@@ -2,7 +2,7 @@
 
 This project is a restoration effort for the Master of Orion II game engine. Check our [documentation portal](https://moo2mod.com/redone/doc/) too.
 
-The game is fully playable, equivalent to last official 1.31 patch and includes all community improvements up to the latest version of the 1.50 community patch. 
+The game is fully playable, equivalent to last official 1.31 patch and includes all community improvements up to the latest version of the unofficial 1.50 patch. 
 
 All rights to Master of Orion II, its assets, trademarks, and related intellectual property belong to their corresponding owners.
 
