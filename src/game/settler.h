@@ -26,14 +26,12 @@ namespace SETTLER {
 
     // Settler words live in packed structures (s_player::settlers), so access
     // them through pointers only via these bytewise helpers.
-    inline value_type __cdecl Load(const value_type* settler_data) {
-        value_type value;
-        memcpy(&value, settler_data, sizeof(value));
-        return value;
+    inline value_type __cdecl Load(const void* settler_data) {
+        return unaligned::Load<value_type>(settler_data);
     }
 
-    inline void __cdecl Store(value_type* settler_data, value_type value) {
-        memcpy(settler_data, &value, sizeof(value));
+    inline void __cdecl Store(void* settler_data, value_type value) {
+        unaligned::Store<value_type>(settler_data, value);
     }
 
     inline int16_t __cdecl Get_Source_Colony(value_type settler_data) {

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <cstdint>
-#include <cstring>
+#include "unaligned.h"
 
 namespace POP {
     using value_type = uint32_t;
@@ -23,14 +23,12 @@ namespace POP {
 
     // Pop words usually live in packed structures (s_colony::pop), so access
     // them through pointers only via these bytewise helpers.
-    inline value_type __cdecl Load(const value_type* pop) {
-        value_type value;
-        memcpy(&value, pop, sizeof(value));
-        return value;
+    inline value_type __cdecl Load(const void* pop) {
+        return unaligned::Load<value_type>(pop);
     }
 
-    inline void __cdecl Store(value_type* pop, value_type value) {
-        memcpy(pop, &value, sizeof(value));
+    inline void __cdecl Store(void* pop, value_type value) {
+        unaligned::Store<value_type>(pop, value);
     }
 
     inline uint32_t __cdecl Get_Race(value_type pop) {

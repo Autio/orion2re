@@ -1,5 +1,5 @@
 #include <cstddef>
-#include <cstring>
+#include "unaligned.h"
 
 #pragma pack(push, 1)
 
@@ -258,13 +258,11 @@ inline const uint8_t* Animation_Frame_Table_(const s_animation_header* header) {
 }
 
 inline uint32_t Animation_Frame_Offset_(const s_animation_header* header, int32_t frame) {
-    uint32_t offset;
-    memcpy(&offset, Animation_Frame_Table_(header) + frame * sizeof(uint32_t), sizeof(offset));
-    return offset;
+    return unaligned::Load<uint32_t>(Animation_Frame_Table_(header) + frame * sizeof(uint32_t));
 }
 
 inline void Set_Animation_Frame_Offset_(s_animation_header* header, int32_t frame, uint32_t offset) {
-    memcpy(Animation_Frame_Table_(header) + frame * sizeof(uint32_t), &offset, sizeof(offset));
+    unaligned::Store<uint32_t>(Animation_Frame_Table_(header) + frame * sizeof(uint32_t), offset);
 }
 
 inline uint8_t* Animation_Frame_Data_(s_animation_header* header, int32_t frame) {

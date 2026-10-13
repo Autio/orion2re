@@ -767,22 +767,8 @@ namespace aidudes {
     }
 
     int __cdecl Sort_Pops_Fixed(const void* a, const void* b) {
-        const uint32_t* pop1 = (const uint32_t*)a;
-        const uint32_t* pop2 = (const uint32_t*)b;
-        uint8_t flag1 = 0;
-        uint32_t val1 = POP::Get_Race(POP::Load(pop1));
-
-        if (val1 == POP::RACE_ANDROID || val1 == POP::RACE_NATIVE) {
-            flag1 = 1;
-        }
-
-        uint8_t flag2 = 0;
-        uint32_t val2 = POP::Get_Race(POP::Load(pop2));
-
-        if (val2 == POP::RACE_ANDROID || val2 == POP::RACE_NATIVE) {
-            flag2 = 1;
-        }
-
+        const bool flag1 = POP::Is_Android_Or_Native(POP::Load(a));
+        const bool flag2 = POP::Is_Android_Or_Native(POP::Load(b));
         return (int)flag2 - (int)flag1;
     }
 
@@ -810,8 +796,8 @@ namespace aidudes {
         }
 
         // Tertiary sort: masked raw value comparison
-        uint32_t val1 = POP::Load((const uint32_t*)a);
-        uint32_t val2 = POP::Load((const uint32_t*)b);
+        uint32_t val1 = POP::Load(a);
+        uint32_t val2 = POP::Load(b);
 
         return (int)POP::Get_Race(val1) - (int)POP::Get_Race(val2);
     }
@@ -1607,7 +1593,7 @@ namespace aidudes {
             return (int32_t)prod_1_p1 - (int32_t)prod_1_p2;
         }
 
-        return (int)(POP::Load(pop1) & 0x0F) - (int)(POP::Load(pop2) & 0x0F);
+        return (int)POP::Get_Race(POP::Load(pop1)) - (int)POP::Get_Race(POP::Load(pop2));
     }
 
     int __cdecl Sort_Pops_R_I(const void* p1, const void* p2) {
@@ -1624,7 +1610,7 @@ namespace aidudes {
         }
 
         if (p2_prod1 == p1_prod1) {
-            return (int)(POP::Load((const uint32_t*)p1) & 0xF) - (int)(POP::Load((const uint32_t*)p2) & 0xF);
+            return (int)POP::Get_Race(POP::Load(p1)) - (int)POP::Get_Race(POP::Load(p2));
         }
 
         return (int)p1_prod1 - (int)p2_prod1;

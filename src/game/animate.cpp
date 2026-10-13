@@ -376,17 +376,12 @@ namespace animate {
             const uint8_t* src =
                 reinterpret_cast<const uint8_t*>(palette_header) + sizeof(s_palette_header);
 
-            // Neither side is guaranteed 4-byte alignment, so compare and
-            // copy each 4-byte entry through memcpy.
             for (int16_t i = 0; i < count; ++i) {
-                uint32_t src_val;
-                uint32_t dst_val;
-                memcpy(&src_val, src + i * sizeof(uint32_t), sizeof(src_val));
-                memcpy(&dst_val, &dst[i], sizeof(dst_val));
+                const uint32_t src_val = unaligned::Load<uint32_t>(src + i * sizeof(uint32_t));
+                const uint32_t dst_val = unaligned::Load<uint32_t>(&dst[i]);
 
                 if (dst_val != src_val) {
-                    src_val += 1;
-                    memcpy(&dst[i], &src_val, sizeof(src_val));
+                    unaligned::Store<uint32_t>(&dst[i], src_val + 1);
                     dst[i].changed = 1;
                 }
             }

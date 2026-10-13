@@ -41,8 +41,7 @@ namespace ERIC {
         // rather than reading through a possibly misaligned int16_t pointer.
         const uint8_t* bytes = (const uint8_t*)list;
         for (uint16_t i = 0; i < count; ++i) {
-            int16_t element;
-            memcpy(&element, bytes + i * sizeof(element), sizeof(element));
+            const int16_t element = unaligned::Load<int16_t>(bytes + i * sizeof(int16_t));
             if (element == value) {
                 return (int16_t)i;
             }

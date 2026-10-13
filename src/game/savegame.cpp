@@ -88,51 +88,42 @@ namespace SAVEGAME {
         void Write_Int16_Array(SERIAL::Writer_* writer, const void* values, size_t count) {
             const uint8_t* bytes = static_cast<const uint8_t*>(values);
             for (size_t i = 0; i < count; ++i) {
-                int16_t value;
-                memcpy(&value, bytes + i * sizeof(value), sizeof(value));
-                writer->Write_Int16(value);
+                writer->Write_Int16(unaligned::Load<int16_t>(bytes + i * sizeof(int16_t)));
             }
         }
 
         void Read_Int16_Array(SERIAL::Reader_* reader, void* values, size_t count) {
             uint8_t* bytes = static_cast<uint8_t*>(values);
             for (size_t i = 0; i < count; ++i) {
-                int16_t value = reader->Read_Int16();
-                memcpy(bytes + i * sizeof(value), &value, sizeof(value));
+                unaligned::Store<int16_t>(bytes + i * sizeof(int16_t), reader->Read_Int16());
             }
         }
 
         void Write_Uint16_Array(SERIAL::Writer_* writer, const void* values, size_t count) {
             const uint8_t* bytes = static_cast<const uint8_t*>(values);
             for (size_t i = 0; i < count; ++i) {
-                uint16_t value;
-                memcpy(&value, bytes + i * sizeof(value), sizeof(value));
-                writer->Write_Uint16(value);
+                writer->Write_Uint16(unaligned::Load<uint16_t>(bytes + i * sizeof(uint16_t)));
             }
         }
 
         void Read_Uint16_Array(SERIAL::Reader_* reader, void* values, size_t count) {
             uint8_t* bytes = static_cast<uint8_t*>(values);
             for (size_t i = 0; i < count; ++i) {
-                uint16_t value = reader->Read_Uint16();
-                memcpy(bytes + i * sizeof(value), &value, sizeof(value));
+                unaligned::Store<uint16_t>(bytes + i * sizeof(uint16_t), reader->Read_Uint16());
             }
         }
 
         void Write_Int32_Array(SERIAL::Writer_* writer, const void* values, size_t count) {
             const uint8_t* bytes = static_cast<const uint8_t*>(values);
             for (size_t i = 0; i < count; ++i) {
-                int32_t value;
-                memcpy(&value, bytes + i * sizeof(value), sizeof(value));
-                writer->Write_Int32(value);
+                writer->Write_Int32(unaligned::Load<int32_t>(bytes + i * sizeof(int32_t)));
             }
         }
 
         void Read_Int32_Array(SERIAL::Reader_* reader, void* values, size_t count) {
             uint8_t* bytes = static_cast<uint8_t*>(values);
             for (size_t i = 0; i < count; ++i) {
-                int32_t value = reader->Read_Int32();
-                memcpy(bytes + i * sizeof(value), &value, sizeof(value));
+                unaligned::Store<int32_t>(bytes + i * sizeof(int32_t), reader->Read_Int32());
             }
         }
 
