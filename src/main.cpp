@@ -87,15 +87,7 @@ static void Shutdown_Game_Log_() {
 
 #if defined(ORION2RE_ASAN_BUILD)
 extern "C" const char* __asan_default_options() {
-    return "log_path=logs/asan";
-}
-
-static void Set_Environment_Variable_If_Unset_(const char* name, const char* value) {
-    if (SDL_getenv(name) != nullptr) {
-        return;
-    }
-
-    SDL_setenv_unsafe(name, value, 0);
+    return "log_path=logs/asan:disable_coredump=1";
 }
 
 static void Configure_Asan_Runtime_() {
@@ -104,16 +96,6 @@ static void Configure_Asan_Runtime_() {
 
     Build_Path_(logs_path, sizeof(logs_path), base_path, "logs");
     SDL_CreateDirectory(logs_path);
-
-#if defined(_WIN32)
-    char dumps_path[1024];
-    char dump_file_path[1024];
-
-    Build_Path_(dumps_path, sizeof(dumps_path), base_path, "dumps");
-    SDL_CreateDirectory(dumps_path);
-    Build_Path_(dump_file_path, sizeof(dump_file_path), base_path, "dumps\\orion2re.dmp");
-    Set_Environment_Variable_If_Unset_("ASAN_SAVE_DUMPS", dump_file_path);
-#endif
 }
 #endif
 
