@@ -6,6 +6,10 @@
 
 #include "fakes/fake_test_support.h"
 
+// Game records are packed, so their members may be misaligned. Assertions
+// on them use double parentheses so doctest compares the values directly
+// instead of binding references to the packed members.
+
 namespace {
     struct Test_Animation_Header {
         alignas(::s_animation_header) unsigned char storage[sizeof(::s_animation_header)]{};
@@ -138,20 +142,20 @@ DOCTEST_TEST_CASE("add button field initializes semantic payload and bounds") {
     DOCTEST_REQUIRE(fields::fields_count == 2);
 
     const s_field& field = fields::fields[field_idx];
-    DOCTEST_CHECK(field.field_type == FIELD_TYPE_BUTTON);
-    DOCTEST_CHECK(field.x == 10);
-    DOCTEST_CHECK(field.y == 20);
-    DOCTEST_CHECK(field.x_end == 30);
-    DOCTEST_CHECK(field.y_end == 28);
-    DOCTEST_CHECK(field.sound == 5);
-    DOCTEST_CHECK(field.hotkey == 'q');
-    DOCTEST_CHECK(field.font_style == 7);
+    DOCTEST_CHECK((field.field_type == FIELD_TYPE_BUTTON));
+    DOCTEST_CHECK((field.x == 10));
+    DOCTEST_CHECK((field.y == 20));
+    DOCTEST_CHECK((field.x_end == 30));
+    DOCTEST_CHECK((field.y_end == 28));
+    DOCTEST_CHECK((field.sound == 5));
+    DOCTEST_CHECK((field.hotkey == 'q'));
+    DOCTEST_CHECK((field.font_style == 7));
 
     const s_field_button* button = fields::Field_Data_Button(&field);
     DOCTEST_REQUIRE(button != nullptr);
-    DOCTEST_CHECK(std::strcmp(button->help, "Launch") == 0);
-    DOCTEST_CHECK(button->pic == &picture);
-    DOCTEST_CHECK(button->draw_style == 1);
+    DOCTEST_CHECK((std::strcmp(button->help, "Launch") == 0));
+    DOCTEST_CHECK((button->pic == &picture));
+    DOCTEST_CHECK((button->draw_style == 1));
 }
 
 DOCTEST_TEST_CASE("add irregular button field stores explicit draw coordinates") {
@@ -165,13 +169,13 @@ DOCTEST_TEST_CASE("add irregular button field stores explicit draw coordinates")
     const s_field& field = fields::fields[field_idx];
     const s_field_irregular_button* payload = fields::Field_Data_Irregular_Button(&field);
 
-    DOCTEST_CHECK(field.field_type == FIELD_TYPE_IRREGULAR_BUTTON);
-    DOCTEST_CHECK(field.hotkey == 'a');
+    DOCTEST_CHECK((field.field_type == FIELD_TYPE_IRREGULAR_BUTTON));
+    DOCTEST_CHECK((field.hotkey == 'a'));
     DOCTEST_REQUIRE(payload != nullptr);
-    DOCTEST_CHECK(payload->draw_x == 11);
-    DOCTEST_CHECK(payload->draw_y == 17);
-    DOCTEST_CHECK(payload->draw_style == 2);
-    DOCTEST_CHECK(std::strcmp(payload->help, "Odd") == 0);
+    DOCTEST_CHECK((payload->draw_x == 11));
+    DOCTEST_CHECK((payload->draw_y == 17));
+    DOCTEST_CHECK((payload->draw_style == 2));
+    DOCTEST_CHECK((std::strcmp(payload->help, "Odd") == 0));
 }
 
 DOCTEST_TEST_CASE("add scroll field stores range value orientation and hotkey") {
@@ -183,15 +187,15 @@ DOCTEST_TEST_CASE("add scroll field stores range value orientation and hotkey") 
     const s_field& field = fields::fields[field_idx];
     const s_field_scroll* scroll = fields::Field_Data_Scroll(&field);
 
-    DOCTEST_CHECK(field.field_type == FIELD_TYPE_SCROLL);
-    DOCTEST_CHECK(field.hotkey == 'm');
+    DOCTEST_CHECK((field.field_type == FIELD_TYPE_SCROLL));
+    DOCTEST_CHECK((field.hotkey == 'm'));
     DOCTEST_REQUIRE(scroll != nullptr);
-    DOCTEST_CHECK(scroll->range_min == 2);
-    DOCTEST_CHECK(scroll->range_max == 12);
-    DOCTEST_CHECK(scroll->return_value == 3);
-    DOCTEST_CHECK(scroll->set_value == 10);
-    DOCTEST_CHECK(scroll->value == &value);
-    DOCTEST_CHECK(scroll->is_vertical == 0);
+    DOCTEST_CHECK((scroll->range_min == 2));
+    DOCTEST_CHECK((scroll->range_max == 12));
+    DOCTEST_CHECK((scroll->return_value == 3));
+    DOCTEST_CHECK((scroll->set_value == 10));
+    DOCTEST_CHECK((scroll->value == &value));
+    DOCTEST_CHECK((scroll->is_vertical == 0));
 }
 
 DOCTEST_TEST_CASE("add grid field computes bounds and clears hotkey") {
@@ -204,15 +208,15 @@ DOCTEST_TEST_CASE("add grid field computes bounds and clears hotkey") {
     const s_field& field = fields::fields[field_idx];
     const s_field_grid* grid = fields::Field_Data_Grid(&field);
 
-    DOCTEST_CHECK(field.field_type == FIELD_TYPE_GRID);
-    DOCTEST_CHECK(field.x_end == 25);
-    DOCTEST_CHECK(field.y_end == 37);
-    DOCTEST_CHECK(field.hotkey == '\0');
+    DOCTEST_CHECK((field.field_type == FIELD_TYPE_GRID));
+    DOCTEST_CHECK((field.x_end == 25));
+    DOCTEST_CHECK((field.y_end == 37));
+    DOCTEST_CHECK((field.hotkey == '\0'));
     DOCTEST_REQUIRE(grid != nullptr);
-    DOCTEST_CHECK(grid->step_x == 7);
-    DOCTEST_CHECK(grid->step_y == 8);
-    DOCTEST_CHECK(grid->grid_x_ptr == &grid_x);
-    DOCTEST_CHECK(grid->grid_y_ptr == &grid_y);
+    DOCTEST_CHECK((grid->step_x == 7));
+    DOCTEST_CHECK((grid->step_y == 8));
+    DOCTEST_CHECK((grid->grid_x_ptr == &grid_x));
+    DOCTEST_CHECK((grid->grid_y_ptr == &grid_y));
 }
 
 DOCTEST_TEST_CASE("draw field for irregular button uses explicit draw origin") {
@@ -223,11 +227,11 @@ DOCTEST_TEST_CASE("draw field for irregular button uses explicit draw origin") {
 
     fields::Draw_Field(field_idx, 0);
 
-    DOCTEST_REQUIRE(test::fakes::g_draw_calls.size() == 1);
-    DOCTEST_CHECK(test::fakes::g_draw_calls[0].x == 111);
-    DOCTEST_CHECK(test::fakes::g_draw_calls[0].y == 222);
-    DOCTEST_REQUIRE(test::fakes::g_print_centered_calls.size() == 1);
-    DOCTEST_CHECK(std::strcmp(test::fakes::g_print_centered_calls[0].text, "Odd") == 0);
+    DOCTEST_REQUIRE((test::fakes::g_draw_calls.size() == 1));
+    DOCTEST_CHECK((test::fakes::g_draw_calls[0].x == 111));
+    DOCTEST_CHECK((test::fakes::g_draw_calls[0].y == 222));
+    DOCTEST_REQUIRE((test::fakes::g_print_centered_calls.size() == 1));
+    DOCTEST_CHECK((std::strcmp(test::fakes::g_print_centered_calls[0].text, "Odd") == 0));
 }
 
 DOCTEST_TEST_CASE("draw field for multi button updates shared selection based on action") {
@@ -237,7 +241,7 @@ DOCTEST_TEST_CASE("draw field for multi button updates shared selection based on
 
     const int16_t field_idx = fields::Add_Multi_Button_Field(3, 4, "Pick", &picture, &selection, 9, "p", 1);
 
-    DOCTEST_CHECK(fields::fields[field_idx].hotkey == 'p');
+    DOCTEST_CHECK((fields::fields[field_idx].hotkey == 'p'));
     fields::Draw_Field(field_idx, 1);
     DOCTEST_CHECK(selection == 9);
 
@@ -307,7 +311,7 @@ DOCTEST_TEST_CASE("check multi hot key fields advances progress and matches comp
     const int16_t field_idx = fields::Add_Multi_Hot_Key_Field("AB");
 
     DOCTEST_CHECK(fields::Check_Multi_Hot_Key_Fields('A') == -1);
-    DOCTEST_CHECK(fields::Field_Data_Multi_Hot_Key(&fields::fields[field_idx])->help_start == 1);
+    DOCTEST_CHECK((fields::Field_Data_Multi_Hot_Key(&fields::fields[field_idx])->help_start == 1));
     DOCTEST_CHECK(fields::Check_Multi_Hot_Key_Fields('B') == field_idx);
 }
 
@@ -322,8 +326,8 @@ DOCTEST_TEST_CASE("clear multi hot key offsets resets every active sequence") {
 
     fields::Clear_Multi_Hot_Key_Offsets();
 
-    DOCTEST_CHECK(fields::Field_Data_Multi_Hot_Key(&fields::fields[first])->help_start == 0);
-    DOCTEST_CHECK(fields::Field_Data_Multi_Hot_Key(&fields::fields[second])->help_start == 0);
+    DOCTEST_CHECK((fields::Field_Data_Multi_Hot_Key(&fields::fields[first])->help_start == 0));
+    DOCTEST_CHECK((fields::Field_Data_Multi_Hot_Key(&fields::fields[second])->help_start == 0));
 }
 
 DOCTEST_TEST_CASE("check help list invokes textbox entry when pointer overlaps help box") {
@@ -358,15 +362,15 @@ DOCTEST_TEST_CASE("add radio button field stores payload and lowercase hotkey") 
     const s_field_radio* radio = fields::Field_Data_Radio(&field);
 
     DOCTEST_REQUIRE(field_idx == 1);
-    DOCTEST_CHECK(field.field_type == FIELD_TYPE_RADIO);
-    DOCTEST_CHECK(field.x_end == 20);
-    DOCTEST_CHECK(field.y_end == 19);
-    DOCTEST_CHECK(field.hotkey == 'r');
+    DOCTEST_CHECK((field.field_type == FIELD_TYPE_RADIO));
+    DOCTEST_CHECK((field.x_end == 20));
+    DOCTEST_CHECK((field.y_end == 19));
+    DOCTEST_CHECK((field.hotkey == 'r'));
     DOCTEST_REQUIRE(radio != nullptr);
-    DOCTEST_CHECK(std::strcmp(radio->help, "Radio") == 0);
-    DOCTEST_CHECK(radio->pic == &picture);
-    DOCTEST_CHECK(radio->draw_style == 1);
-    DOCTEST_CHECK(radio->selection == &selection);
+    DOCTEST_CHECK((std::strcmp(radio->help, "Radio") == 0));
+    DOCTEST_CHECK((radio->pic == &picture));
+    DOCTEST_CHECK((radio->draw_style == 1));
+    DOCTEST_CHECK((radio->selection == &selection));
 }
 
 DOCTEST_TEST_CASE("add locked button field stores payload and lowercase hotkey") {
@@ -384,15 +388,15 @@ DOCTEST_TEST_CASE("add locked button field stores payload and lowercase hotkey")
     const s_field_locked* locked = fields::Field_Data_Locked_Button(&field);
 
     DOCTEST_REQUIRE(field_idx == 1);
-    DOCTEST_CHECK(field.field_type == FIELD_TYPE_LOCKED);
-    DOCTEST_CHECK(field.x_end == 43);
-    DOCTEST_CHECK(field.y_end == 45);
-    DOCTEST_CHECK(field.hotkey == 'l');
+    DOCTEST_CHECK((field.field_type == FIELD_TYPE_LOCKED));
+    DOCTEST_CHECK((field.x_end == 43));
+    DOCTEST_CHECK((field.y_end == 45));
+    DOCTEST_CHECK((field.hotkey == 'l'));
     DOCTEST_REQUIRE(locked != nullptr);
-    DOCTEST_CHECK(std::strcmp(locked->help, "Lock") == 0);
-    DOCTEST_CHECK(locked->pic == &picture);
-    DOCTEST_CHECK(locked->draw_style == 2);
-    DOCTEST_CHECK(locked->selection == &selection);
+    DOCTEST_CHECK((std::strcmp(locked->help, "Lock") == 0));
+    DOCTEST_CHECK((locked->pic == &picture));
+    DOCTEST_CHECK((locked->draw_style == 2));
+    DOCTEST_CHECK((locked->selection == &selection));
 }
 
 DOCTEST_TEST_CASE("add continuous input field stores copied colors and clamps max length") {
@@ -409,22 +413,22 @@ DOCTEST_TEST_CASE("add continuous input field stores copied colors and clamps ma
     const s_field& field = fields::fields[field_idx];
     const s_field_cont_input* cont_input = fields::Field_Data_Continuous_Input(&field);
 
-    DOCTEST_CHECK(field.field_type == FIELD_TYPE_CONTINUOUS_INPUT);
-    DOCTEST_CHECK(field.x_end == 120);
-    DOCTEST_CHECK(field.y_end == 72);
-    DOCTEST_CHECK(field.font_color == &fields::list_normal_color);
-    DOCTEST_CHECK(field.hotkey == 0);
+    DOCTEST_CHECK((field.field_type == FIELD_TYPE_CONTINUOUS_INPUT));
+    DOCTEST_CHECK((field.x_end == 120));
+    DOCTEST_CHECK((field.y_end == 72));
+    DOCTEST_CHECK((field.font_color == &fields::list_normal_color));
+    DOCTEST_CHECK((field.hotkey == 0));
     DOCTEST_REQUIRE(cont_input != nullptr);
-    DOCTEST_CHECK(cont_input->highlight_color == &fields::list_highlight_colors);
-    DOCTEST_CHECK(cont_input->buffer == buffer);
-    DOCTEST_CHECK(cont_input->max_length == 256);
-    DOCTEST_CHECK(cont_input->pic == &picture);
-    DOCTEST_CHECK(cont_input->background_color == 4);
-    DOCTEST_CHECK(cont_input->font_shadow_style == 1);
+    DOCTEST_CHECK((cont_input->highlight_color == &fields::list_highlight_colors));
+    DOCTEST_CHECK((cont_input->buffer == buffer));
+    DOCTEST_CHECK((cont_input->max_length == 256));
+    DOCTEST_CHECK((cont_input->pic == &picture));
+    DOCTEST_CHECK((cont_input->background_color == 4));
+    DOCTEST_CHECK((cont_input->font_shadow_style == 1));
 
     for (int i = 0; i < 8; ++i) {
-        DOCTEST_CHECK(fields::list_normal_color.colors[i] == test::fakes::g_font_color.colors[i]);
-        DOCTEST_CHECK(fields::list_highlight_colors.colors[i] == test::fakes::g_font_color.colors[i]);
+        DOCTEST_CHECK((fields::list_normal_color.colors[i] == test::fakes::g_font_color.colors[i]));
+        DOCTEST_CHECK((fields::list_highlight_colors.colors[i] == test::fakes::g_font_color.colors[i]));
     }
 }
 
@@ -442,23 +446,23 @@ DOCTEST_TEST_CASE("add string list field stores row metadata and hotkey") {
     const s_field& field = fields::fields[field_idx];
     const s_field_string_list* string_list = fields::Field_Data_String_List(&field);
 
-    DOCTEST_CHECK(field.field_type == FIELD_TYPE_STRING_LIST);
-    DOCTEST_CHECK(field.x == 10);
-    DOCTEST_CHECK(field.y == 19);
-    DOCTEST_CHECK(field.x_end == 40);
-    DOCTEST_CHECK(field.y_end == 30);
-    DOCTEST_CHECK(field.hotkey == 'z');
-    DOCTEST_CHECK(field.font_style == 6);
-    DOCTEST_CHECK(field.font_color == &fields::list_normal_color);
+    DOCTEST_CHECK((field.field_type == FIELD_TYPE_STRING_LIST));
+    DOCTEST_CHECK((field.x == 10));
+    DOCTEST_CHECK((field.y == 19));
+    DOCTEST_CHECK((field.x_end == 40));
+    DOCTEST_CHECK((field.y_end == 30));
+    DOCTEST_CHECK((field.hotkey == 'z'));
+    DOCTEST_CHECK((field.font_style == 6));
+    DOCTEST_CHECK((field.font_color == &fields::list_normal_color));
     DOCTEST_REQUIRE(string_list != nullptr);
-    DOCTEST_CHECK(std::strcmp(string_list->help, "Row") == 0);
-    DOCTEST_CHECK(string_list->value == &selected_value);
-    DOCTEST_CHECK(string_list->help_start == 4);
-    DOCTEST_CHECK(string_list->is_selectable == 1);
-    DOCTEST_CHECK(string_list->gradient_mode == 7);
-    DOCTEST_CHECK(string_list->gradient_palette == gradient_palette);
-    DOCTEST_CHECK(string_list->gradient_extra == 42);
-    DOCTEST_CHECK(string_list->gradient_pic == &picture);
+    DOCTEST_CHECK((std::strcmp(string_list->help, "Row") == 0));
+    DOCTEST_CHECK((string_list->value == &selected_value));
+    DOCTEST_CHECK((string_list->help_start == 4));
+    DOCTEST_CHECK((string_list->is_selectable == 1));
+    DOCTEST_CHECK((string_list->gradient_mode == 7));
+    DOCTEST_CHECK((string_list->gradient_palette == gradient_palette));
+    DOCTEST_CHECK((string_list->gradient_extra == 42));
+    DOCTEST_CHECK((string_list->gradient_pic == &picture));
 }
 
 DOCTEST_TEST_CASE("draw field radio action path uses selected text offsets when selection is clear") {
@@ -472,10 +476,10 @@ DOCTEST_TEST_CASE("draw field radio action path uses selected text offsets when 
 
     fields::Draw_Field(field_idx, 1);
 
-    DOCTEST_REQUIRE(test::fakes::g_draw_calls.size() == 1);
-    DOCTEST_REQUIRE(test::fakes::g_print_centered_calls.size() == 1);
-    DOCTEST_CHECK(test::fakes::g_print_centered_calls[0].x == 30);
-    DOCTEST_CHECK(test::fakes::g_print_centered_calls[0].y == 30);
+    DOCTEST_REQUIRE((test::fakes::g_draw_calls.size() == 1));
+    DOCTEST_REQUIRE((test::fakes::g_print_centered_calls.size() == 1));
+    DOCTEST_CHECK((test::fakes::g_print_centered_calls[0].x == 30));
+    DOCTEST_CHECK((test::fakes::g_print_centered_calls[0].y == 30));
 }
 
 DOCTEST_TEST_CASE("draw field locked selected path uses selected text offsets") {
@@ -489,10 +493,10 @@ DOCTEST_TEST_CASE("draw field locked selected path uses selected text offsets") 
 
     fields::Draw_Field(field_idx, 0);
 
-    DOCTEST_REQUIRE(test::fakes::g_draw_calls.size() == 1);
-    DOCTEST_REQUIRE(test::fakes::g_print_centered_calls.size() == 1);
-    DOCTEST_CHECK(test::fakes::g_print_centered_calls[0].x == 50);
-    DOCTEST_CHECK(test::fakes::g_print_centered_calls[0].y == 50);
+    DOCTEST_REQUIRE((test::fakes::g_draw_calls.size() == 1));
+    DOCTEST_REQUIRE((test::fakes::g_print_centered_calls.size() == 1));
+    DOCTEST_CHECK((test::fakes::g_print_centered_calls[0].x == 50));
+    DOCTEST_CHECK((test::fakes::g_print_centered_calls[0].y == 50));
 }
 
 DOCTEST_TEST_CASE("get alt alpha key maps known and unknown codes") {
@@ -516,16 +520,16 @@ DOCTEST_TEST_CASE("add clipped circle field stores clipped bounds and circle pay
     const s_field& field = fields::fields[field_idx];
     const s_field_circle* circle = fields::Field_Data_Circle(&field);
 
-    DOCTEST_CHECK(field.field_type == FIELD_TYPE_CIRCLE);
-    DOCTEST_CHECK(field.x == 40);
-    DOCTEST_CHECK(field.y == 50);
-    DOCTEST_CHECK(field.x_end == 60);
-    DOCTEST_CHECK(field.y_end == 70);
-    DOCTEST_CHECK(field.hotkey == 'c');
+    DOCTEST_CHECK((field.field_type == FIELD_TYPE_CIRCLE));
+    DOCTEST_CHECK((field.x == 40));
+    DOCTEST_CHECK((field.y == 50));
+    DOCTEST_CHECK((field.x_end == 60));
+    DOCTEST_CHECK((field.y_end == 70));
+    DOCTEST_CHECK((field.hotkey == 'c'));
     DOCTEST_REQUIRE(circle != nullptr);
-    DOCTEST_CHECK(circle->center_x == 50);
-    DOCTEST_CHECK(circle->center_y == 60);
-    DOCTEST_CHECK(circle->radius_squared == 225);
+    DOCTEST_CHECK((circle->center_x == 50));
+    DOCTEST_CHECK((circle->center_y == 60));
+    DOCTEST_CHECK((circle->radius_squared == 225));
 }
 
 DOCTEST_TEST_CASE("interpret mouse input selects circle only when click is inside radius") {
@@ -606,19 +610,19 @@ DOCTEST_TEST_CASE("add clipped hidden field clips bounds and preserves shortcut 
         90, 190, 170, 270, "H", 4);
 
     const s_field& field = fields::fields[field_idx];
-    DOCTEST_CHECK(field.field_type == FIELD_TYPE_HIDDEN);
-    DOCTEST_CHECK(field.x == 100);
-    DOCTEST_CHECK(field.y == 200);
-    DOCTEST_CHECK(field.x_end == 150);
-    DOCTEST_CHECK(field.y_end == 260);
-    DOCTEST_CHECK(field.hotkey == 'h');
+    DOCTEST_CHECK((field.field_type == FIELD_TYPE_HIDDEN));
+    DOCTEST_CHECK((field.x == 100));
+    DOCTEST_CHECK((field.y == 200));
+    DOCTEST_CHECK((field.x_end == 150));
+    DOCTEST_CHECK((field.y_end == 260));
+    DOCTEST_CHECK((field.hotkey == 'h'));
 
     const int16_t shifted_idx = fields::Add_Clipped_Hidden_Field(
         100, 200, 110, 210, "Q!", 0);
     const int16_t null_idx = fields::Add_Clipped_Hidden_Field(
         100, 200, 110, 210, nullptr, 0);
-    DOCTEST_CHECK(fields::fields[shifted_idx].hotkey == 'Q');
-    DOCTEST_CHECK(fields::fields[null_idx].hotkey == '\0');
+    DOCTEST_CHECK((fields::fields[shifted_idx].hotkey == 'Q'));
+    DOCTEST_CHECK((fields::fields[null_idx].hotkey == '\0'));
 }
 
 DOCTEST_TEST_CASE("add clipped hidden field returns sentinel when rectangle is fully outside clip window") {
@@ -638,10 +642,10 @@ DOCTEST_TEST_CASE("add hot key creates hidden field with lowercase hotkey") {
     const int16_t field_idx = fields::Add_Hot_Key("k");
 
     const s_field& field = fields::fields[field_idx];
-    DOCTEST_CHECK(field.field_type == FIELD_TYPE_HIDDEN);
-    DOCTEST_CHECK(field.x == 5000);
-    DOCTEST_CHECK(field.y == 5000);
-    DOCTEST_CHECK(field.hotkey == 'k');
+    DOCTEST_CHECK((field.field_type == FIELD_TYPE_HIDDEN));
+    DOCTEST_CHECK((field.x == 5000));
+    DOCTEST_CHECK((field.y == 5000));
+    DOCTEST_CHECK((field.hotkey == 'k'));
 }
 
 DOCTEST_TEST_CASE("add hot key accepts null as no shortcut") {
@@ -649,7 +653,7 @@ DOCTEST_TEST_CASE("add hot key accepts null as no shortcut") {
 
     const int16_t field_idx = fields::Add_Hot_Key(nullptr);
 
-    DOCTEST_CHECK(fields::fields[field_idx].hotkey == '\0');
+    DOCTEST_CHECK((fields::fields[field_idx].hotkey == '\0'));
 }
 
 DOCTEST_TEST_CASE("add hidden field stores explicit bounds sound and lowercase hotkey") {
@@ -661,13 +665,13 @@ DOCTEST_TEST_CASE("add hidden field stores explicit bounds sound and lowercase h
     DOCTEST_CHECK(fields::fields_count == 2);
 
     const s_field& field = fields::fields[field_idx];
-    DOCTEST_CHECK(field.field_type == FIELD_TYPE_HIDDEN);
-    DOCTEST_CHECK(field.x == 1);
-    DOCTEST_CHECK(field.y == 2);
-    DOCTEST_CHECK(field.x_end == 30);
-    DOCTEST_CHECK(field.y_end == 40);
-    DOCTEST_CHECK(field.sound == 7);
-    DOCTEST_CHECK(field.hotkey == 'h');
+    DOCTEST_CHECK((field.field_type == FIELD_TYPE_HIDDEN));
+    DOCTEST_CHECK((field.x == 1));
+    DOCTEST_CHECK((field.y == 2));
+    DOCTEST_CHECK((field.x_end == 30));
+    DOCTEST_CHECK((field.y_end == 40));
+    DOCTEST_CHECK((field.sound == 7));
+    DOCTEST_CHECK((field.hotkey == 'h'));
 }
 
 DOCTEST_TEST_CASE("add hidden field lowercases one-character alphabetic hotkeys") {
@@ -676,9 +680,9 @@ DOCTEST_TEST_CASE("add hidden field lowercases one-character alphabetic hotkeys"
     const int16_t upper_idx = fields::Add_Hidden_Field(10, 20, 30, 40, "Q", 1);
     const int16_t digit_idx = fields::Add_Hidden_Field(11, 21, 31, 41, "7", 2);
 
-    DOCTEST_CHECK(fields::fields[upper_idx].hotkey == 'q');
-    DOCTEST_CHECK(fields::fields[digit_idx].hotkey == '7');
-    DOCTEST_CHECK(fields::fields[digit_idx].sound == 2);
+    DOCTEST_CHECK((fields::fields[upper_idx].hotkey == 'q'));
+    DOCTEST_CHECK((fields::fields[digit_idx].hotkey == '7'));
+    DOCTEST_CHECK((fields::fields[digit_idx].sound == 2));
     DOCTEST_CHECK(fields::fields_count == 3);
 }
 
@@ -690,12 +694,12 @@ DOCTEST_TEST_CASE("add hidden field appends sequentially after existing fields")
 
     DOCTEST_CHECK(second_idx == 2);
     DOCTEST_CHECK(fields::fields_count == 3);
-    DOCTEST_CHECK(fields::fields[second_idx].x == 3);
-    DOCTEST_CHECK(fields::fields[second_idx].y == 4);
-    DOCTEST_CHECK(fields::fields[second_idx].x_end == 5);
-    DOCTEST_CHECK(fields::fields[second_idx].y_end == 6);
-    DOCTEST_CHECK(fields::fields[second_idx].hotkey == 'b');
-    DOCTEST_CHECK(fields::fields[second_idx].sound == 9);
+    DOCTEST_CHECK((fields::fields[second_idx].x == 3));
+    DOCTEST_CHECK((fields::fields[second_idx].y == 4));
+    DOCTEST_CHECK((fields::fields[second_idx].x_end == 5));
+    DOCTEST_CHECK((fields::fields[second_idx].y_end == 6));
+    DOCTEST_CHECK((fields::fields[second_idx].hotkey == 'b'));
+    DOCTEST_CHECK((fields::fields[second_idx].sound == 9));
 }
 
 DOCTEST_TEST_CASE("scan input ignores non-selectable string list rows") {
@@ -816,18 +820,18 @@ DOCTEST_TEST_CASE("add clipped button field stores payload and bounds when clipp
     const s_field& field = fields::fields[field_idx];
     const s_field_button* button = fields::Field_Data_Button(&field);
 
-    DOCTEST_CHECK(field.field_type == FIELD_TYPE_BUTTON);
-    DOCTEST_CHECK(field.x == 90);
-    DOCTEST_CHECK(field.y == 120);
-    DOCTEST_CHECK(field.x_end == 109);
-    DOCTEST_CHECK(field.y_end == 129);
-    DOCTEST_CHECK(field.sound == 1);
-    DOCTEST_CHECK(field.hotkey == 'b');
-    DOCTEST_CHECK(field.font_style == 6);
+    DOCTEST_CHECK((field.field_type == FIELD_TYPE_BUTTON));
+    DOCTEST_CHECK((field.x == 90));
+    DOCTEST_CHECK((field.y == 120));
+    DOCTEST_CHECK((field.x_end == 109));
+    DOCTEST_CHECK((field.y_end == 129));
+    DOCTEST_CHECK((field.sound == 1));
+    DOCTEST_CHECK((field.hotkey == 'b'));
+    DOCTEST_CHECK((field.font_style == 6));
     DOCTEST_REQUIRE(button != nullptr);
-    DOCTEST_CHECK(std::strcmp(button->help, "Btn") == 0);
-    DOCTEST_CHECK(button->pic == &picture);
-    DOCTEST_CHECK(button->draw_style == 2);
+    DOCTEST_CHECK((std::strcmp(button->help, "Btn") == 0));
+    DOCTEST_CHECK((button->pic == &picture));
+    DOCTEST_CHECK((button->draw_style == 2));
 }
 
 DOCTEST_TEST_CASE("add clipped button field accepts sprite fully inside clipping window") {
@@ -847,11 +851,11 @@ DOCTEST_TEST_CASE("add clipped button field accepts sprite fully inside clipping
 
     DOCTEST_REQUIRE(field_idx == 1);
     DOCTEST_CHECK(fields::fields_count == 2);
-    DOCTEST_CHECK(fields::fields[field_idx].x == 100);
-    DOCTEST_CHECK(fields::fields[field_idx].y == 100);
-    DOCTEST_CHECK(fields::fields[field_idx].x_end == 119);
-    DOCTEST_CHECK(fields::fields[field_idx].y_end == 109);
-    DOCTEST_CHECK(fields::fields[field_idx].hotkey == 'c');
+    DOCTEST_CHECK((fields::fields[field_idx].x == 100));
+    DOCTEST_CHECK((fields::fields[field_idx].y == 100));
+    DOCTEST_CHECK((fields::fields[field_idx].x_end == 119));
+    DOCTEST_CHECK((fields::fields[field_idx].y_end == 109));
+    DOCTEST_CHECK((fields::fields[field_idx].hotkey == 'c'));
 }
 
 DOCTEST_TEST_CASE("add clipped button field rejects sprite touching right or bottom edge beyond allowed range") {
@@ -1033,7 +1037,7 @@ DOCTEST_TEST_CASE("interpret keyboard input advances but does not complete multi
 
     DOCTEST_CHECK(fields::Interpret_Keyboard_Input(&resolved_field) == 0x1E00);
     DOCTEST_CHECK(resolved_field == 0);
-    DOCTEST_CHECK(fields::Field_Data_Multi_Hot_Key(&fields::fields[1])->help_start == 1);
+    DOCTEST_CHECK((fields::Field_Data_Multi_Hot_Key(&fields::fields[1])->help_start == 1));
 }
 
 DOCTEST_TEST_CASE("interpret keyboard input leaves multi hotkey unresolved when alt mapping is unknown") {
@@ -1047,7 +1051,7 @@ DOCTEST_TEST_CASE("interpret keyboard input leaves multi hotkey unresolved when 
 
     DOCTEST_CHECK(fields::Interpret_Keyboard_Input(&resolved_field) == static_cast<int16_t>(0x9999));
     DOCTEST_CHECK(resolved_field == 0);
-    DOCTEST_CHECK(fields::Field_Data_Multi_Hot_Key(&fields::fields[1])->help_start == 0);
+    DOCTEST_CHECK((fields::Field_Data_Multi_Hot_Key(&fields::fields[1])->help_start == 0));
 }
 
 DOCTEST_TEST_CASE("interpret keyboard input suppresses hotkey resolution whenever active input field number is set") {
@@ -1214,20 +1218,20 @@ DOCTEST_TEST_CASE("disable and enable draw field roundtrip through encoded hidde
     fields::Disable_Draw_Field(locked_idx);
     fields::Disable_Draw_Field(multi_idx);
 
-    DOCTEST_CHECK(fields::fields[button_idx].field_type == -1001);
-    DOCTEST_CHECK(fields::fields[radio_idx].field_type == -1);
-    DOCTEST_CHECK(fields::fields[locked_idx].field_type == -2);
-    DOCTEST_CHECK(fields::fields[multi_idx].field_type == -3);
+    DOCTEST_CHECK((fields::fields[button_idx].field_type == -1001));
+    DOCTEST_CHECK((fields::fields[radio_idx].field_type == -1));
+    DOCTEST_CHECK((fields::fields[locked_idx].field_type == -2));
+    DOCTEST_CHECK((fields::fields[multi_idx].field_type == -3));
 
     fields::Enable_Draw_Field(button_idx);
     fields::Enable_Draw_Field(radio_idx);
     fields::Enable_Draw_Field(locked_idx);
     fields::Enable_Draw_Field(multi_idx);
 
-    DOCTEST_CHECK(fields::fields[button_idx].field_type == FIELD_TYPE_BUTTON);
-    DOCTEST_CHECK(fields::fields[radio_idx].field_type == FIELD_TYPE_RADIO);
-    DOCTEST_CHECK(fields::fields[locked_idx].field_type == FIELD_TYPE_LOCKED);
-    DOCTEST_CHECK(fields::fields[multi_idx].field_type == FIELD_TYPE_MULTI_BUTTON);
+    DOCTEST_CHECK((fields::fields[button_idx].field_type == FIELD_TYPE_BUTTON));
+    DOCTEST_CHECK((fields::fields[radio_idx].field_type == FIELD_TYPE_RADIO));
+    DOCTEST_CHECK((fields::fields[locked_idx].field_type == FIELD_TYPE_LOCKED));
+    DOCTEST_CHECK((fields::fields[multi_idx].field_type == FIELD_TYPE_MULTI_BUTTON));
 }
 
 DOCTEST_TEST_CASE("draw visible fields clamps scroll value and renders string list text") {
@@ -1243,8 +1247,8 @@ DOCTEST_TEST_CASE("draw visible fields clamps scroll value and renders string li
     fields::Draw_Visible_Fields();
 
     DOCTEST_CHECK(scroll_value == 90);
-    DOCTEST_REQUIRE(!test::fakes::g_print_calls.empty());
-    DOCTEST_CHECK(std::strcmp(test::fakes::g_print_calls.back().text, "Row") == 0);
+    DOCTEST_REQUIRE((!test::fakes::g_print_calls.empty()));
+    DOCTEST_CHECK((std::strcmp(test::fakes::g_print_calls.back().text, "Row") == 0));
 }
 
 DOCTEST_TEST_CASE("draw visible fields renders selected button-like field variants with offset paths") {
@@ -1263,12 +1267,12 @@ DOCTEST_TEST_CASE("draw visible fields renders selected button-like field varian
 
     fields::Draw_Visible_Fields();
 
-    DOCTEST_CHECK(test::fakes::g_draw_calls.size() == 4);
-    DOCTEST_REQUIRE(test::fakes::g_print_centered_calls.size() == 4);
-    DOCTEST_CHECK(test::fakes::g_print_centered_calls[0].text_copy == "Btn");
-    DOCTEST_CHECK(test::fakes::g_print_centered_calls[1].text_copy == "Rad");
-    DOCTEST_CHECK(test::fakes::g_print_centered_calls[2].text_copy == "Lock");
-    DOCTEST_CHECK(test::fakes::g_print_centered_calls[3].text_copy == "Multi");
+    DOCTEST_CHECK((test::fakes::g_draw_calls.size() == 4));
+    DOCTEST_REQUIRE((test::fakes::g_print_centered_calls.size() == 4));
+    DOCTEST_CHECK((test::fakes::g_print_centered_calls[0].text_copy == "Btn"));
+    DOCTEST_CHECK((test::fakes::g_print_centered_calls[1].text_copy == "Rad"));
+    DOCTEST_CHECK((test::fakes::g_print_centered_calls[2].text_copy == "Lock"));
+    DOCTEST_CHECK((test::fakes::g_print_centered_calls[3].text_copy == "Multi"));
 }
 
 DOCTEST_TEST_CASE("draw visible fields uses pressed-state draw path for button-like fields") {
@@ -1280,9 +1284,9 @@ DOCTEST_TEST_CASE("draw visible fields uses pressed-state draw path for button-l
 
     fields::Draw_Visible_Fields();
 
-    DOCTEST_REQUIRE(test::fakes::g_print_centered_calls.size() == 1);
-    DOCTEST_CHECK(test::fakes::g_print_centered_calls[0].x == 20);
-    DOCTEST_CHECK(test::fakes::g_print_centered_calls[0].y == 10);
+    DOCTEST_REQUIRE((test::fakes::g_print_centered_calls.size() == 1));
+    DOCTEST_CHECK((test::fakes::g_print_centered_calls[0].x == 20));
+    DOCTEST_CHECK((test::fakes::g_print_centered_calls[0].y == 10));
 }
 
 DOCTEST_TEST_CASE("draw visible fields renders continuous input and appends cursor marker when blink state changes to on") {
@@ -1300,10 +1304,10 @@ DOCTEST_TEST_CASE("draw visible fields renders continuous input and appends curs
     fields::Draw_Visible_Fields();
 
     DOCTEST_CHECK(std::strcmp(fields::continuous_string, "Alpha_") == 0);
-    DOCTEST_REQUIRE(!test::fakes::g_fill_calls.empty());
-    DOCTEST_REQUIRE(!test::fakes::g_draw_calls.empty());
-    DOCTEST_REQUIRE(!test::fakes::g_print_calls.empty());
-    DOCTEST_CHECK(test::fakes::g_print_calls.back().text_copy == "Alpha_");
+    DOCTEST_REQUIRE((!test::fakes::g_fill_calls.empty()));
+    DOCTEST_REQUIRE((!test::fakes::g_draw_calls.empty()));
+    DOCTEST_REQUIRE((!test::fakes::g_print_calls.empty()));
+    DOCTEST_CHECK((test::fakes::g_print_calls.back().text_copy == "Alpha_"));
 }
 
 DOCTEST_TEST_CASE("draw visible fields removes continuous input cursor marker when blink toggles off") {
@@ -1321,8 +1325,8 @@ DOCTEST_TEST_CASE("draw visible fields removes continuous input cursor marker wh
     fields::Draw_Visible_Fields();
 
     DOCTEST_CHECK(std::strcmp(fields::continuous_string, "Alpha") == 0);
-    DOCTEST_REQUIRE(!test::fakes::g_print_calls.empty());
-    DOCTEST_CHECK(test::fakes::g_print_calls.back().text_copy == "Alpha");
+    DOCTEST_REQUIRE((!test::fakes::g_print_calls.empty()));
+    DOCTEST_CHECK((test::fakes::g_print_calls.back().text_copy == "Alpha"));
 }
 
 DOCTEST_TEST_CASE("draw visible fields draws field and help outlines when overlay modes are enabled") {
@@ -1344,9 +1348,9 @@ DOCTEST_TEST_CASE("draw visible fields draws field and help outlines when overla
 
     fields::Draw_Visible_Fields();
 
-    DOCTEST_REQUIRE(test::fakes::g_line_calls.size() == 8);
-    DOCTEST_CHECK(test::fakes::g_line_calls[0].color == 12);
-    DOCTEST_CHECK(test::fakes::g_line_calls[4].color == 34);
+    DOCTEST_REQUIRE((test::fakes::g_line_calls.size() == 8));
+    DOCTEST_CHECK((test::fakes::g_line_calls[0].color == 12));
+    DOCTEST_CHECK((test::fakes::g_line_calls[4].color == 34));
 }
 
 DOCTEST_TEST_CASE("draw visible fields back clamps scroll value and renders string list text") {
@@ -1362,8 +1366,8 @@ DOCTEST_TEST_CASE("draw visible fields back clamps scroll value and renders stri
     fields::Draw_Visible_Fields_Back();
 
     DOCTEST_CHECK(scroll_value == 10);
-    DOCTEST_REQUIRE(!test::fakes::g_print_calls.empty());
-    DOCTEST_CHECK(std::strcmp(test::fakes::g_print_calls.back().text, "BackRow") == 0);
+    DOCTEST_REQUIRE((!test::fakes::g_print_calls.empty()));
+    DOCTEST_CHECK((std::strcmp(test::fakes::g_print_calls.back().text, "BackRow") == 0));
 }
 
 DOCTEST_TEST_CASE("draw visible fields back renders selected button-like field variants with offset paths") {
@@ -1382,12 +1386,12 @@ DOCTEST_TEST_CASE("draw visible fields back renders selected button-like field v
 
     fields::Draw_Visible_Fields_Back();
 
-    DOCTEST_CHECK(test::fakes::g_draw_calls.size() == 4);
-    DOCTEST_REQUIRE(test::fakes::g_print_centered_calls.size() == 4);
-    DOCTEST_CHECK(test::fakes::g_print_centered_calls[0].text_copy == "Btn");
-    DOCTEST_CHECK(test::fakes::g_print_centered_calls[1].text_copy == "Rad");
-    DOCTEST_CHECK(test::fakes::g_print_centered_calls[2].text_copy == "Lock");
-    DOCTEST_CHECK(test::fakes::g_print_centered_calls[3].text_copy == "Multi");
+    DOCTEST_CHECK((test::fakes::g_draw_calls.size() == 4));
+    DOCTEST_REQUIRE((test::fakes::g_print_centered_calls.size() == 4));
+    DOCTEST_CHECK((test::fakes::g_print_centered_calls[0].text_copy == "Btn"));
+    DOCTEST_CHECK((test::fakes::g_print_centered_calls[1].text_copy == "Rad"));
+    DOCTEST_CHECK((test::fakes::g_print_centered_calls[2].text_copy == "Lock"));
+    DOCTEST_CHECK((test::fakes::g_print_centered_calls[3].text_copy == "Multi"));
 }
 
 DOCTEST_TEST_CASE("draw visible fields back uses pressed-state draw path for button-like fields") {
@@ -1399,9 +1403,9 @@ DOCTEST_TEST_CASE("draw visible fields back uses pressed-state draw path for but
 
     fields::Draw_Visible_Fields_Back();
 
-    DOCTEST_REQUIRE(test::fakes::g_print_centered_calls.size() == 1);
-    DOCTEST_CHECK(test::fakes::g_print_centered_calls[0].x == 20);
-    DOCTEST_CHECK(test::fakes::g_print_centered_calls[0].y == 10);
+    DOCTEST_REQUIRE((test::fakes::g_print_centered_calls.size() == 1));
+    DOCTEST_CHECK((test::fakes::g_print_centered_calls[0].x == 20));
+    DOCTEST_CHECK((test::fakes::g_print_centered_calls[0].y == 10));
 }
 
 DOCTEST_TEST_CASE("draw visible fields back renders active continuous input with cursor marker") {
@@ -1418,10 +1422,10 @@ DOCTEST_TEST_CASE("draw visible fields back renders active continuous input with
     fields::Draw_Visible_Fields_Back();
 
     DOCTEST_CHECK(std::strcmp(fields::continuous_string, "Alpha_") == 0);
-    DOCTEST_REQUIRE(!test::fakes::g_fill_calls.empty());
-    DOCTEST_REQUIRE(!test::fakes::g_draw_calls.empty());
-    DOCTEST_REQUIRE(!test::fakes::g_print_calls.empty());
-    DOCTEST_CHECK(test::fakes::g_print_calls.back().text_copy == "Alpha_");
+    DOCTEST_REQUIRE((!test::fakes::g_fill_calls.empty()));
+    DOCTEST_REQUIRE((!test::fakes::g_draw_calls.empty()));
+    DOCTEST_REQUIRE((!test::fakes::g_print_calls.empty()));
+    DOCTEST_CHECK((test::fakes::g_print_calls.back().text_copy == "Alpha_"));
 }
 
 DOCTEST_TEST_CASE("draw visible fields back renders inactive continuous input from stored buffer") {
@@ -1433,9 +1437,9 @@ DOCTEST_TEST_CASE("draw visible fields back renders inactive continuous input fr
 
     fields::Draw_Visible_Fields_Back();
 
-    DOCTEST_REQUIRE(!test::fakes::g_fill_calls.empty());
-    DOCTEST_REQUIRE(!test::fakes::g_print_calls.empty());
-    DOCTEST_CHECK(test::fakes::g_print_calls.back().text_copy == "Stored");
+    DOCTEST_REQUIRE((!test::fakes::g_fill_calls.empty()));
+    DOCTEST_REQUIRE((!test::fakes::g_print_calls.empty()));
+    DOCTEST_CHECK((test::fakes::g_print_calls.back().text_copy == "Stored"));
 }
 
 DOCTEST_TEST_CASE("draw visible fields back draws field and help outlines when overlay modes are enabled") {
@@ -1457,9 +1461,9 @@ DOCTEST_TEST_CASE("draw visible fields back draws field and help outlines when o
 
     fields::Draw_Visible_Fields_Back();
 
-    DOCTEST_REQUIRE(test::fakes::g_line_calls.size() == 8);
-    DOCTEST_CHECK(test::fakes::g_line_calls[0].color == 12);
-    DOCTEST_CHECK(test::fakes::g_line_calls[4].color == 34);
+    DOCTEST_REQUIRE((test::fakes::g_line_calls.size() == 8));
+    DOCTEST_CHECK((test::fakes::g_line_calls[0].color == 12));
+    DOCTEST_CHECK((test::fakes::g_line_calls[4].color == 34));
 }
 
 DOCTEST_TEST_CASE("interpret mouse input held left button toggles radio on release path") {
@@ -1498,9 +1502,9 @@ DOCTEST_TEST_CASE("draw field button action path uses selected text offsets") {
 
     fields::Draw_Field(field_idx, 1);
 
-    DOCTEST_REQUIRE(test::fakes::g_print_centered_calls.size() == 1);
-    DOCTEST_CHECK(test::fakes::g_print_centered_calls[0].x == 20);
-    DOCTEST_CHECK(test::fakes::g_print_centered_calls[0].y == 20);
+    DOCTEST_REQUIRE((test::fakes::g_print_centered_calls.size() == 1));
+    DOCTEST_CHECK((test::fakes::g_print_centered_calls[0].x == 20));
+    DOCTEST_CHECK((test::fakes::g_print_centered_calls[0].y == 20));
 }
 
 DOCTEST_TEST_CASE("draw field radio default path uses centered text without selected offset") {
@@ -1512,9 +1516,9 @@ DOCTEST_TEST_CASE("draw field radio default path uses centered text without sele
 
     fields::Draw_Field(field_idx, 0);
 
-    DOCTEST_REQUIRE(test::fakes::g_print_centered_calls.size() == 1);
-    DOCTEST_CHECK(test::fakes::g_print_centered_calls[0].x == 29);
-    DOCTEST_CHECK(test::fakes::g_print_centered_calls[0].y == 31);
+    DOCTEST_REQUIRE((test::fakes::g_print_centered_calls.size() == 1));
+    DOCTEST_CHECK((test::fakes::g_print_centered_calls[0].x == 29));
+    DOCTEST_CHECK((test::fakes::g_print_centered_calls[0].y == 31));
 }
 
 DOCTEST_TEST_CASE("draw field locked default path uses centered text without selected offset") {
@@ -1526,9 +1530,9 @@ DOCTEST_TEST_CASE("draw field locked default path uses centered text without sel
 
     fields::Draw_Field(field_idx, 0);
 
-    DOCTEST_REQUIRE(test::fakes::g_print_centered_calls.size() == 1);
-    DOCTEST_CHECK(test::fakes::g_print_centered_calls[0].x == 49);
-    DOCTEST_CHECK(test::fakes::g_print_centered_calls[0].y == 51);
+    DOCTEST_REQUIRE((test::fakes::g_print_centered_calls.size() == 1));
+    DOCTEST_CHECK((test::fakes::g_print_centered_calls[0].x == 49));
+    DOCTEST_CHECK((test::fakes::g_print_centered_calls[0].y == 51));
 }
 
 DOCTEST_TEST_CASE("display input field draws underline cursor for input mode zero") {
@@ -1558,8 +1562,8 @@ DOCTEST_TEST_CASE("display input field draws underline cursor for input mode zer
 
     fields::Display_Input_Field(1, buffer);
 
-    DOCTEST_REQUIRE(!test::fakes::g_print_calls.empty());
-    DOCTEST_CHECK(test::fakes::g_print_calls.back().text_copy == "ABC");
+    DOCTEST_REQUIRE((!test::fakes::g_print_calls.empty()));
+    DOCTEST_CHECK((test::fakes::g_print_calls.back().text_copy == "ABC"));
 }
 
 DOCTEST_TEST_CASE("display input field blinks underline cursor for input mode one") {
@@ -1590,8 +1594,8 @@ DOCTEST_TEST_CASE("display input field blinks underline cursor for input mode on
 
     fields::Display_Input_Field(1, buffer);
 
-    DOCTEST_REQUIRE(!test::fakes::g_print_calls.empty());
-    DOCTEST_CHECK(test::fakes::g_print_calls.back().text_copy == "ABC");
+    DOCTEST_REQUIRE((!test::fakes::g_print_calls.empty()));
+    DOCTEST_CHECK((test::fakes::g_print_calls.back().text_copy == "ABC"));
     DOCTEST_CHECK(fields::cursor_on == 1);
 }
 
@@ -1623,9 +1627,9 @@ DOCTEST_TEST_CASE("display input field mode zero draws lower cursor ramp when cu
 
     fields::Display_Input_Field(1, buffer);
 
-    DOCTEST_REQUIRE(test::fakes::g_line_calls.size() == 2);
-    DOCTEST_CHECK(test::fakes::g_line_calls.front().y1 == 21);
-    DOCTEST_CHECK(test::fakes::g_line_calls.back().y1 == 20);
+    DOCTEST_REQUIRE((test::fakes::g_line_calls.size() == 2));
+    DOCTEST_CHECK((test::fakes::g_line_calls.front().y1 == 21));
+    DOCTEST_CHECK((test::fakes::g_line_calls.back().y1 == 20));
 }
 
 DOCTEST_TEST_CASE("display input field mode zero skips cursor lines when cursor position is zero") {
@@ -1655,9 +1659,9 @@ DOCTEST_TEST_CASE("display input field mode zero skips cursor lines when cursor 
 
     fields::Display_Input_Field(1, buffer);
 
-    DOCTEST_CHECK(test::fakes::g_line_calls.empty());
-    DOCTEST_REQUIRE(!test::fakes::g_print_calls.empty());
-    DOCTEST_CHECK(test::fakes::g_print_calls.back().text_copy == "ABC");
+    DOCTEST_CHECK((test::fakes::g_line_calls.empty()));
+    DOCTEST_REQUIRE((!test::fakes::g_print_calls.empty()));
+    DOCTEST_CHECK((test::fakes::g_print_calls.back().text_copy == "ABC"));
 }
 
 DOCTEST_TEST_CASE("display input field fills background when background color is nonzero") {
@@ -1687,12 +1691,12 @@ DOCTEST_TEST_CASE("display input field fills background when background color is
 
     fields::Display_Input_Field(1, buffer);
 
-    DOCTEST_REQUIRE(test::fakes::g_fill_calls.size() == 1);
-    DOCTEST_CHECK(test::fakes::g_fill_calls[0].x1 == 9);
-    DOCTEST_CHECK(test::fakes::g_fill_calls[0].y1 == 20);
-    DOCTEST_CHECK(test::fakes::g_fill_calls[0].x2 == 50);
-    DOCTEST_CHECK(test::fakes::g_fill_calls[0].y2 == 30);
-    DOCTEST_CHECK(test::fakes::g_fill_calls[0].color == 9);
+    DOCTEST_REQUIRE((test::fakes::g_fill_calls.size() == 1));
+    DOCTEST_CHECK((test::fakes::g_fill_calls[0].x1 == 9));
+    DOCTEST_CHECK((test::fakes::g_fill_calls[0].y1 == 20));
+    DOCTEST_CHECK((test::fakes::g_fill_calls[0].x2 == 50));
+    DOCTEST_CHECK((test::fakes::g_fill_calls[0].y2 == 30));
+    DOCTEST_CHECK((test::fakes::g_fill_calls[0].color == 9));
 }
 
 DOCTEST_TEST_CASE("display input field mode one toggles cursor off on next blink boundary") {
@@ -1724,7 +1728,7 @@ DOCTEST_TEST_CASE("display input field mode one toggles cursor off on next blink
     fields::Display_Input_Field(1, buffer);
 
     DOCTEST_CHECK(fields::cursor_on == 0);
-    DOCTEST_CHECK(test::fakes::g_line_calls.empty());
+    DOCTEST_CHECK((test::fakes::g_line_calls.empty()));
 }
 
 DOCTEST_TEST_CASE("display input field with unsupported input mode still prints text") {
@@ -1751,12 +1755,12 @@ DOCTEST_TEST_CASE("display input field with unsupported input mode still prints 
 
     fields::Display_Input_Field(1, buffer);
 
-    DOCTEST_CHECK(test::fakes::g_line_calls.empty());
-    DOCTEST_REQUIRE(!test::fakes::g_print_calls.empty());
-    DOCTEST_CHECK(test::fakes::g_print_calls.back().text_copy == "ABC");
+    DOCTEST_CHECK((test::fakes::g_line_calls.empty()));
+    DOCTEST_REQUIRE((!test::fakes::g_print_calls.empty()));
+    DOCTEST_CHECK((test::fakes::g_print_calls.back().text_copy == "ABC"));
     DOCTEST_CHECK(test::fakes::g_mark_time_calls == 1);
-    DOCTEST_REQUIRE(!test::fakes::g_release_time_calls.empty());
-    DOCTEST_CHECK(test::fakes::g_release_time_calls.back() == fields::auto_function_delay);
+    DOCTEST_REQUIRE((!test::fakes::g_release_time_calls.empty()));
+    DOCTEST_CHECK((test::fakes::g_release_time_calls.back() == fields::auto_function_delay));
 }
 
 DOCTEST_TEST_CASE("input string accepts typed character and commits on enter") {
@@ -2241,7 +2245,7 @@ DOCTEST_TEST_CASE("draw field legacy input delegates to display input field") {
 
     fields::Draw_Field(1, 0);
 
-    DOCTEST_CHECK(test::fakes::g_print_calls.empty());
+    DOCTEST_CHECK((test::fakes::g_print_calls.empty()));
 }
 
 DOCTEST_TEST_CASE("interpret mouse input backtick toggles field box mode") {
@@ -2554,9 +2558,9 @@ DOCTEST_TEST_CASE("fatal exit with message defers dialog display to the main-thr
 
     DOCTEST_CHECK_THROWS_AS(exitm::Exit_With_Message(message.c_str()), platform::process_exit_requested);
     DOCTEST_CHECK(platform::Exit_Requested());
-    DOCTEST_CHECK(std::strcmp(platform::Exit_Message(), message.c_str()) == 0);
+    DOCTEST_CHECK((std::strcmp(platform::Exit_Message(), message.c_str()) == 0));
     DOCTEST_CHECK(platform::Exit_Status() == EXIT_FAILURE);
-    DOCTEST_CHECK(test::fakes::g_last_message_box_text.empty());
+    DOCTEST_CHECK((test::fakes::g_last_message_box_text.empty()));
 
     exitm::Present_Exit_Message(nullptr);
 
@@ -2570,9 +2574,9 @@ DOCTEST_TEST_CASE("normal exit preserves successful status and defers its messag
 
     DOCTEST_CHECK_THROWS_AS(exitm::Exit_Normally(message.c_str()), platform::process_exit_requested);
     DOCTEST_CHECK(platform::Exit_Requested());
-    DOCTEST_CHECK(std::strcmp(platform::Exit_Message(), message.c_str()) == 0);
+    DOCTEST_CHECK((std::strcmp(platform::Exit_Message(), message.c_str()) == 0));
     DOCTEST_CHECK(platform::Exit_Status() == EXIT_SUCCESS);
-    DOCTEST_CHECK(test::fakes::g_last_message_box_text.empty());
+    DOCTEST_CHECK((test::fakes::g_last_message_box_text.empty()));
 
     exitm::Present_Exit_Message(nullptr);
 
@@ -2587,7 +2591,7 @@ DOCTEST_TEST_CASE("normal exit without a message remains noninteractive") {
     exitm::Present_Exit_Message(nullptr);
 
     DOCTEST_CHECK(platform::Exit_Status() == EXIT_SUCCESS);
-    DOCTEST_CHECK(test::fakes::g_last_message_box_text.empty());
+    DOCTEST_CHECK((test::fakes::g_last_message_box_text.empty()));
 }
 
 }
