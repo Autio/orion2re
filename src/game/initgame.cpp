@@ -501,12 +501,20 @@ namespace INITGAME {
         memcpy(MOX::leaders, leader_records, MAX_LEADERS * sizeof(s_leader_data));
 
         for (int16_t i = 0; i < MAX_LEADERS; ++i) {
+            // Skill masks are misaligned in the packed leader record, so
+            // generate them in locals and store them afterward.
+            uint32_t special_skills;
+            uint32_t general_skills;
             if (i == OFFICER::progression.special_leaders.random_skills_colony_leader_id) {
                 // Special handling for leader at index 41
-                OFFICER::Get_Random_Skills(&MOX::leaders[i].special_skills, &MOX::leaders[i].general_skills, 2, 5, 1);
+                OFFICER::Get_Random_Skills(&special_skills, &general_skills, 2, 5, 1);
+                MOX::leaders[i].special_skills = special_skills;
+                MOX::leaders[i].general_skills = general_skills;
             } else if (i == OFFICER::progression.special_leaders.random_skills_ship_officer_id) {
                 // Special handling for leader at index 52
-                OFFICER::Get_Random_Skills(&MOX::leaders[i].special_skills, &MOX::leaders[i].general_skills, 1, 5, 1);
+                OFFICER::Get_Random_Skills(&special_skills, &general_skills, 1, 5, 1);
+                MOX::leaders[i].special_skills = special_skills;
+                MOX::leaders[i].general_skills = general_skills;
             } else if (i == 65) {
                 // Special randomized tech application for leader at index 65
                 MOX::leaders[i].tech_application[0] = (uint8_t)game_random::Random(101);
