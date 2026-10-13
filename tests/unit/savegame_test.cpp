@@ -703,8 +703,11 @@ DOCTEST_TEST_CASE("version 5 save extension sections are independently framed") 
 }
 
 DOCTEST_TEST_CASE("latest and version 0 save streams restore the complete persisted state") {
-    State_ expected;
-    State_ actual;
+    // Each State_ is over a megabyte, too large for the stack.
+    auto expected_state = std::make_unique<State_>();
+    auto actual_state = std::make_unique<State_>();
+    State_& expected = *expected_state;
+    State_& actual = *actual_state;
     Bind_State_(expected);
     Fill_State_(expected);
     config::s_config_state default_config;
