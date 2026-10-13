@@ -57,6 +57,7 @@ target_include_directories(orion2re_test_config_defaults PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/src"
 )
 target_link_libraries(orion2re_test_config_defaults PRIVATE SDL3::Headers)
+orion2re_enable_sanitizers(orion2re_test_config_defaults)
 
 function(orion2re_add_unit_test TARGET_NAME)
     cmake_parse_arguments(ORION2RE_TEST "LINK_SDL" "" "SOURCES;PRODUCTION_SOURCES;FAKE_SOURCES;LIBRARIES" ${ARGN})
@@ -90,6 +91,7 @@ function(orion2re_add_unit_test TARGET_NAME)
         orion2re_test_config_defaults
         ${ORION2RE_TEST_LIBRARIES}
     )
+    orion2re_enable_sanitizers(${TARGET_NAME})
 
     if(MSVC)
         target_compile_options(${TARGET_NAME} PRIVATE /W3 /permissive-)
