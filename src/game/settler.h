@@ -24,13 +24,25 @@ namespace SETTLER {
     constexpr value_type MASK_PROF = 0x0000030000000000ull;
     constexpr value_type MASK_RESERVED = 0x0000FC0000000000ull;
 
+    // Settler words live in packed structures (s_player::settlers), so access
+    // them through pointers only via these bytewise helpers.
+    inline value_type __cdecl Load(const value_type* settler_data) {
+        value_type value;
+        memcpy(&value, settler_data, sizeof(value));
+        return value;
+    }
+
+    inline void __cdecl Store(value_type* settler_data, value_type value) {
+        memcpy(settler_data, &value, sizeof(value));
+    }
+
     inline int16_t __cdecl Get_Source_Colony(value_type settler_data) {
         return static_cast<int16_t>(settler_data & MASK_SOURCE_COLONY);
     }
 
     inline void __cdecl Set_Source_Colony(value_type* settler_data, int16_t source_colony) {
-        *settler_data = (*settler_data & ~MASK_SOURCE_COLONY) |
-            static_cast<uint16_t>(source_colony);
+        Store(settler_data, (Load(settler_data) & ~MASK_SOURCE_COLONY) |
+            static_cast<uint16_t>(source_colony));
     }
 
     inline int16_t __cdecl Get_Dest_Planet(value_type settler_data) {
@@ -38,8 +50,8 @@ namespace SETTLER {
     }
 
     inline void __cdecl Set_Dest_Planet(value_type* settler_data, int16_t dest_planet) {
-        *settler_data = (*settler_data & ~MASK_DEST_PLANET) |
-            (static_cast<value_type>(static_cast<uint16_t>(dest_planet)) << 16);
+        Store(settler_data, (Load(settler_data) & ~MASK_DEST_PLANET) |
+            (static_cast<value_type>(static_cast<uint16_t>(dest_planet)) << 16));
     }
 
     inline uint32_t __cdecl Get_Race(value_type settler_data) {
@@ -47,8 +59,8 @@ namespace SETTLER {
     }
 
     inline void __cdecl Set_Race(value_type* settler_data, uint32_t race) {
-        *settler_data = (*settler_data & ~MASK_RACE) |
-            ((static_cast<value_type>(race) & 0x0Fu) << 32);
+        Store(settler_data, (Load(settler_data) & ~MASK_RACE) |
+            ((static_cast<value_type>(race) & 0x0Fu) << 32));
     }
 
     inline uint32_t __cdecl Get_Eta(value_type settler_data) {
@@ -56,8 +68,8 @@ namespace SETTLER {
     }
 
     inline void __cdecl Set_Eta(value_type* settler_data, uint32_t eta) {
-        *settler_data = (*settler_data & ~MASK_ETA) |
-            ((static_cast<value_type>(eta) & 0x0Fu) << 36);
+        Store(settler_data, (Load(settler_data) & ~MASK_ETA) |
+            ((static_cast<value_type>(eta) & 0x0Fu) << 36));
     }
 
     inline POP::e_prof __cdecl Get_Prof(value_type settler_data) {
@@ -65,8 +77,8 @@ namespace SETTLER {
     }
 
     inline void __cdecl Set_Prof(value_type* settler_data, POP::e_prof prof) {
-        *settler_data = (*settler_data & ~MASK_PROF) |
-            ((static_cast<value_type>(prof) & 0x03u) << 40);
+        Store(settler_data, (Load(settler_data) & ~MASK_PROF) |
+            ((static_cast<value_type>(prof) & 0x03u) << 40));
     }
 
     inline value_type __cdecl From_Legacy(legacy_value_type settler_data) {
