@@ -3559,11 +3559,11 @@ namespace COLCALC {
         for (uint32_t* pop_record_ptr = colony->pop;
              pop_record_ptr < colony->pop + pop_count;
              ++pop_record_ptr) {
-            uint32_t pop_record = *pop_record_ptr;
+            uint32_t pop_record = POP::Load(pop_record_ptr);
             const uint32_t pop_owner = (pop_record & 0x70u) >> 4;
 
             if (MOX::player[pop_owner].traits[TRAIT_CURRENT_GOVERNMENT] == GOVERNMENT_FEUDAL) {
-                *pop_record_ptr = (((owner_bits ^ pop_record) & 0x70u) ^ pop_record);
+                POP::Store(pop_record_ptr, ((owner_bits ^ pop_record) & 0x70u) ^ pop_record);
             }
         }
 

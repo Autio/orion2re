@@ -124,7 +124,7 @@ namespace COLCALC {
 
         // Convert all initial population to Scientists
         for (uint32_t* p = p_pop; p < p_pop_end; ++p) {
-            *p = (*p & 0xffffff7f) | 0x00000100; // Scientist flag set, Worker flag cleared
+            POP::Store(p, (POP::Load(p) & 0xffffff7f) | 0x00000100); // Scientist flag set, Worker flag cleared
         }
 
         int16_t star_idx = MOX::planet[colony->planet].star_index;
@@ -134,7 +134,7 @@ namespace COLCALC {
 
         // Convert Scientists to Workers to meet industry maintenance requirements
         while (p_pop < p_pop_end && colony->production[ECON_INDUSTRY] < (int16_t)colony->maintenance[ECON_INDUSTRY]) {
-            *p_pop = (*p_pop & 0xfffffeff) | 0x00000080; // Worker flag set, Scientist flag cleared
+            POP::Store(p_pop, (POP::Load(p_pop) & 0xfffffeff) | 0x00000080); // Worker flag set, Scientist flag cleared
             Recalculate_Colony(colony);
             last_adjusted_pop = p_pop;
             p_pop++;
@@ -143,7 +143,7 @@ namespace COLCALC {
         // Convert Pops to Farmers if colony has food multipliers and needs to meet maintenance
         if (colony->food2_per_farmer != 0) {
             while (p_pop < p_pop_end && (int16_t)colony->maintenance[ECON_FOOD] > colony->production[ECON_FOOD]) {
-                *p_pop = (*p_pop & 0xfffffe7f); // Clear Scientist and Worker flags -> Farmer
+                POP::Store(p_pop, (POP::Load(p_pop) & 0xfffffe7f)); // Clear Scientist and Worker flags -> Farmer
                 Recalculate_Colony(colony);
                 last_adjusted_pop = p_pop;
                 p_pop++;
@@ -152,7 +152,7 @@ namespace COLCALC {
 
         // Convert Scientists to Workers if Research production exceeds Industry
         while (p_pop < p_pop_end && colony->production[ECON_RESEARCH] > colony->production[ECON_INDUSTRY]) {
-            *p_pop = (*p_pop & 0xfffffeff) | 0x00000080; // Worker flag set, Scientist flag cleared
+            POP::Store(p_pop, (POP::Load(p_pop) & 0xfffffeff) | 0x00000080); // Worker flag set, Scientist flag cleared
             Recalculate_Colony(colony);
             last_adjusted_pop = p_pop;
             p_pop++;
@@ -161,7 +161,7 @@ namespace COLCALC {
         // If Industry is balanced or higher than Research, switch the last adjusted Pop back to Scientist
         if (last_adjusted_pop != nullptr &&
             colony->production[ECON_INDUSTRY] >= colony->production[ECON_RESEARCH]) {
-            *last_adjusted_pop = (*last_adjusted_pop & 0xffffff7f) | 0x00000100;
+            POP::Store(last_adjusted_pop, (POP::Load(last_adjusted_pop) & 0xffffff7f) | 0x00000100);
             Recalculate_Colony(colony);
         }
 
