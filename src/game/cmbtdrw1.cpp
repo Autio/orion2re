@@ -432,6 +432,8 @@ namespace CMBTDRW1 {
         char msg_buffer[80];
         char itoa_buffer[80];
 
+        if (MOX::cur_ship < 0 || MOX::cur_ship >= MOX::combat_total_ship_count) return;
+
         if (MOX::cur_ship != 0) {
             s_combat_data* ship = &MOX::combat_data[MOX::cur_ship];
 
@@ -618,6 +620,8 @@ namespace CMBTDRW1 {
         char msg_buffer[80];
         int16_t visible_special_count = 0;
         int16_t y_pos = 0x17c;
+
+        if (MOX::cur_ship < 0 || MOX::cur_ship >= MOX::combat_total_ship_count) return;
 
         color_active = {{0x50, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53}};
         color_inactive = {{0xDF, 0xDC, 0xDC, 0xDC, 0xDC, 0xDC, 0xDC, 0xDC}};
@@ -1503,16 +1507,20 @@ namespace CMBTDRW1 {
         video::Set_Page_Off();
         CMBTDRW1::Full_Draw_Combat_Screen();
 
-        if (MOX::ship_status_display == 0) {
-            CMBTDRW1::Draw_Weapon_Status_Display(-1, -1);
-        } else {
-            CMBTDRW1::Draw_Special_Status_Display();
+        if (MOX::cur_ship >= 0 && MOX::cur_ship < MOX::combat_total_ship_count) {
+            if (MOX::ship_status_display == 0) {
+                CMBTDRW1::Draw_Weapon_Status_Display(-1, -1);
+            } else {
+                CMBTDRW1::Draw_Special_Status_Display();
+            }
         }
 
         graphics::Interlaced_Fill(0x191, 0x16a, 0x1e9, 0x176, 0x0, 199 /* 0xc7 */);
         graphics::Interlaced_Fill(0x191, 0x17b, 0x1e8, 0x1d3, 0x0, 199 /* 0xc7 */);
 
-        CMBTDRW1::Draw_Internals_Display(0x191, 0x17b);
+        if (MOX::cur_ship >= 0 && MOX::cur_ship < MOX::combat_total_ship_count) {
+            CMBTDRW1::Draw_Internals_Display(0x191, 0x17b);
+        }
         MOX::last_ship_status = 666 /* 0x29a */;
 
         CMBTDRW1::Draw_Main_Combat_Screen();
@@ -2842,6 +2850,8 @@ namespace CMBTDRW1 {
         char arc_text[80];
 
         graphics::Interlaced_Fill(114, 378, 263, 466, 0, 199);
+
+        if (MOX::cur_ship < 0 || MOX::cur_ship >= MOX::combat_total_ship_count) return;
 
         short y_pos = 380; // 0x17c
 
