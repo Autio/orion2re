@@ -111,12 +111,8 @@ namespace {
         expected.wormhole_star_id = -1;
         expected.next_wfi_in_list = -1;
         memset(expected.officer_index, 0xFF, sizeof(expected.officer_index));
-        for (int16_t& planet_index : expected.planet_index) {
-            planet_index = -1;
-        }
-        for (int16_t& relocation : expected.relocate_ship_to) {
-            relocation = -1;
-        }
+        memset(expected.planet_index, 0xFF, sizeof(expected.planet_index));
+        memset(expected.relocate_ship_to, 0xFF, sizeof(expected.relocate_ship_to));
         memset(expected.surrender_to, 0xFF, sizeof(expected.surrender_to));
         return memcmp(&star, &expected, sizeof(star)) == 0;
     }
