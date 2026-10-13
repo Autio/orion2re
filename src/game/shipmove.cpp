@@ -571,19 +571,24 @@ namespace SHIPMOVE {
                     ship->x = star_x;
                     ship->y = star_y;
                 } else {
+                    // ship->x/y are packed fields, so move through aligned locals.
+                    int16_t new_x = ship->x;
+                    int16_t new_y = ship->y;
                     GEO::Move_Player_1_Turn_To_Star(
                         ship->owner,
                         ship->x,
                         ship->y,
                         star_idx,
                         (uint16_t)(uint8_t)ship->travelling_speed,
-                        &ship->x,
-                        &ship->y,
+                        &new_x,
+                        &new_y,
                         (ship->group_has_navigator == 0 &&
                             (!jump_gate_pass_nebula || !Ship_Uses_Jump_Gate(ship)))
                             ? &unused_navigator_flag
                             : nullptr,
                         &unused_direction);
+                    ship->x = new_x;
+                    ship->y = new_y;
                 }
 
                 ship->turns_left--;
