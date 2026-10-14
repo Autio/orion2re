@@ -5,6 +5,25 @@ The existing AI still makes the decisions. The journal records evaluations,
 selected wars, and end-of-turn treaty/trade/research changes. It does not invent
 long-term plans, and it does not yet cover economic or military planning.
 
+## Journal styles
+
+Choose **Empire chronicle** in the dashboard for longer first-person entries,
+personality-based flavor, and a running account of expansion, losses, and recorded
+wars. **Engine log** retains the original concise events. The dashboard remembers
+the selected style; an OBS source can select it explicitly with
+`/?overlay=1&empire=0&style=chronicle`.
+
+Chronicles replay the existing journal, so enabling them does not restart the
+match. Prose is deterministic and generated locally without an LLM or API key.
+It is labeled dramatization, not canonical lore or access to hidden AI thoughts.
+History references only earlier records. Snapshot changes supply additional
+milestones, but cannot identify an attacker, planet, or battle cause. Enable
+evidence to inspect the recorded inputs; raw engine journals remain unchanged.
+
+When restarting only the companion server during a match, pass
+`--preserve-control` to keep the current playback interval. Normal startup and
+graceful shutdown still pause autoplay.
+
 ## Preview without game data
 
 From the repository root:
@@ -155,3 +174,9 @@ Meklar/Klackon treaty changes (`0 -> 4`) appeared in the actual browser journal.
 The simulation continued afterward. The dashboard's Pause button stopped it at
 35137, verified through repeated journal reads. This validates the real
 engine-to-browser event path, not just sample data.
+
+Chronicle validation: all 16 Python tests and JavaScript syntax validation pass.
+Tests cover deterministic replay, past-only historical context, war duration,
+session resets, preservation of raw events, and elimination after a population
+of one. The live dashboard was checked with the existing match and playback
+remained at its five-second interval during the companion-server update.

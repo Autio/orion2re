@@ -9,6 +9,11 @@ let selected = params.get("empire") || "all";
 let lastKey = "";
 let rosterKey = "";
 let cached;
+let journalStyle = params.get("style") === "chronicle" ? "chronicle" : "log";
+if (!params.has("style") && !overlay) {
+  try { journalStyle = localStorage.getItem("orion-journal-style") === "chronicle" ? "chronicle" : "log"; } catch {}
+}
+$("style").value = journalStyle;
 function node(tag, cls, text) { const e = document.createElement(tag); if(cls) e.className = cls; if(text !== undefined) e.textContent = text; return e; }
 function render(state) {
   cached = state;
@@ -20,6 +25,7 @@ function render(state) {
   $("play").disabled = state.demo || !record || record.finished;
   $("pause").disabled = state.demo;
   $("notice").textContent = state.demo ? "ILLUSTRATIVE DEMO · Sample journal data, not a running game." : !record ? "Waiting for a journal. Start a single-player game and activate ALLAI." : record.finished ? "Match complete. Automatic turn advancement has stopped." : `Last journal received ${age}s ago. ${state.errors ? `${state.errors} malformed records skipped. ` : ""}${record.dropped_events ? `${record.dropped_events} events omitted at the per-turn limit. ` : ""}Spectator statistics are omniscient; journal entries describe recorded decisions.`;
+  if (journalStyle === "chronicle") $("notice").textContent += " Empire chronicle: dramatized voice drawn from recorded history. Unrecorded motives and battle causes are not invented.";
   if (!record) return;
   const roster = JSON.stringify(record.empires.map(e => [e.id, e.name]));
   if (roster !== rosterKey) {
@@ -27,7 +33,7 @@ function render(state) {
     $("empire").replaceChildren(new Option("All empires", "all"), ...record.empires.map(e => new Option(e.name, String(e.id))));
     $("empire").value = selected;
   }
-  const key = JSON.stringify([record, state.journals, selected, $("evidence").checked]);
+  const key = JSON.stringify([record, state.journals, state.chronicles, state.summaries, selected, journalStyle, $("evidence").checked]);
   if (key === lastKey) return;
   lastKey = key;
   const cards = [];
@@ -44,13 +50,22 @@ function render(state) {
     }
     head.append(title, stats);
     const entries = node("div", "entries");
-    const history = [...(state.journals[empire.id] || [])].reverse().slice(0, overlay ? 5 : 20);
+    const narrative = journalStyle === "chronicle";
+    const summary = narrative && state.summaries?.[empire.id];
+    if (summary) {
+      const chapter = node("div", "chapter");
+      chapter.append(node("div", "chapter-label", "DRAMATIZED EMPIRE CHRONICLE"), node("h3", "", summary.title), node("p", "", summary.text));
+      head.append(chapter);
+    }
+    const source = narrative ? state.chronicles : state.journals;
+    const history = [...(source?.[empire.id] || [])].reverse().slice(0, overlay ? (narrative ? 3 : 5) : 20);
     if (!history.length) entries.append(node("div", "empty", "No recorded diplomatic decisions yet. The empire's journal will appear here as decisions are made."));
     for (const event of history) {
       const entry = node("div", "entry"), meta = node("div", "entry-meta");
       meta.append(node("span", "kind", event.kind), node("span", "", (event.stardate/10).toFixed(1)));
-      entry.append(meta, node("p", "", event.text));
-      if ($("evidence").checked) { const detail = node("details"); detail.open = true; detail.append(node("summary", "", "Engine evidence"), node("div", "", event.evidence)); entry.append(detail); }
+      entry.append(meta, node("p", "", narrative ? event.narrative || event.text : event.text));
+      if (narrative && event.history) entry.append(node("p", "history", event.history));
+      if ($("evidence").checked) { const detail = node("details"); detail.open = true; detail.append(node("summary", "", event.source === "snapshot" ? "Snapshot evidence" : "Engine evidence"), node("div", "", event.text), node("div", "", event.evidence)); entry.append(detail); }
       entries.append(entry);
     }
     card.append(head, entries); cards.push(card);
@@ -60,6 +75,11 @@ function render(state) {
 }
 $("empire").addEventListener("change", () => { selected = $("empire").value; if(cached) render(cached); });
 $("evidence").addEventListener("change", () => { if(cached) render(cached); });
+$("style").addEventListener("change", () => {
+  journalStyle = $("style").value;
+  if (!overlay) { try { localStorage.setItem("orion-journal-style", journalStyle); } catch {} }
+  if (cached) render(cached);
+});
 async function control(interval) {
   try { const response = await fetch("/api/control", {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({interval})}); if(!response.ok) throw new Error(); }
   catch { $("notice").textContent = "Could not update playback controls. Check the local stream server."; }

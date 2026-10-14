@@ -9,6 +9,8 @@ import threading
 import time
 from urllib.parse import urlsplit
 
+from chronicle import Chronicle
+
 
 class Journal:
     def __init__(self, path):
@@ -18,6 +20,7 @@ class Journal:
         self.pending = b""
         self.latest = None
         self.entries = defaultdict(lambda: deque(maxlen=60))
+        self.chronicle = Chronicle()
         self.updated = None
         self.errors = 0
         self.lock = threading.Lock()
@@ -37,14 +40,21 @@ class Journal:
                 raise ValueError("Invalid empire")
             if empire["id"] in ids or not isinstance(empire.get("name"), str):
                 raise ValueError("Invalid empire name or duplicate id")
+            for key in ("colonies", "population", "ships", "personality"):
+                if key in empire and type(empire[key]) is not int:
+                    raise ValueError("Invalid empire statistic")
             ids.add(empire["id"])
         for event in events:
             if not isinstance(event, dict) or event.get("player") not in ids:
                 raise ValueError("Invalid event player")
             if any(not isinstance(event.get(key), str) for key in ("text", "kind", "evidence")):
                 raise ValueError("Invalid event text")
+            if type(event.get("target", -1)) is not int or not -1 <= event.get("target", -1) < 8:
+                raise ValueError("Invalid event target")
         if self.latest is None or record["session"] != self.latest["session"] or record["stardate"] < self.latest["stardate"]:
             self.entries.clear()
+            self.chronicle = Chronicle()
+        self.chronicle.consume(record)
         self.latest = record
         for event in events:
             self.entries[event["player"]].append({**event, "stardate": record["stardate"]})
@@ -59,6 +69,7 @@ class Journal:
                 self.pending = b""
                 self.latest = None
                 self.entries.clear()
+                self.chronicle = Chronicle()
                 self.identity = identity
             with self.path.open("rb") as file:
                 file.seek(self.offset)
@@ -87,6 +98,8 @@ class Journal:
         with self.lock:
             self.refresh()
             return {"latest": self.latest, "journals": {key: list(value) for key, value in self.entries.items()},
+                    "chronicles": {key: list(value) for key, value in self.chronicle.entries.items()},
+                    "summaries": dict(self.chronicle.summaries),
                     "updated": self.updated, "errors": self.errors}
 
 
@@ -173,12 +186,15 @@ def main():
     parser.add_argument("--control", type=Path, default=Path("out/stream/control.txt"))
     parser.add_argument("--port", type=int, default=8765)
     parser.add_argument("--demo", action="store_true")
+    parser.add_argument("--preserve-control", action="store_true",
+                        help="Keep the current playback state while restarting the companion server")
     args = parser.parse_args()
     if not args.demo and args.journal is None:
         parser.error("--journal is required unless --demo is selected")
     journal = Journal(Path(__file__).with_name("demo.jsonl") if args.demo else args.journal)
-    write_control(args.control, 0)
     server = ThreadingHTTPServer(("127.0.0.1", args.port), make_handler(journal, args.control, args.demo))
+    if not args.preserve_control:
+        write_control(args.control, 0)
     print(f"Journal dashboard: http://127.0.0.1:{args.port}/", flush=True)
     print(f"OBS browser source: http://127.0.0.1:{args.port}/?overlay=1&empire=0", flush=True)
     try:
