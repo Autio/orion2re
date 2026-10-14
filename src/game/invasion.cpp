@@ -1,4 +1,5 @@
 #include "pch.h"
+#include "spectator.h"
 
 namespace invasion {
 
@@ -640,6 +641,7 @@ namespace invasion {
         }
 
         colony->owner = (int8_t)new_owner_idx;
+        spectator::Colony_Transferred(old_owner, new_owner_idx, colony->planet);
         COLCALC::Do_Colony_Owner_Change_Star_Colony_Stuff(colony);
 
         if (MOX::player[new_owner_idx].home_planet_id == -1) {

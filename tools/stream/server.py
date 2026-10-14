@@ -40,9 +40,11 @@ class Journal:
                 raise ValueError("Invalid empire")
             if empire["id"] in ids or not isinstance(empire.get("name"), str):
                 raise ValueError("Invalid empire name or duplicate id")
-            for key in ("colonies", "population", "ships", "personality"):
+            for key in ("colonies", "population", "ships", "personality", "research_accumulated"):
                 if key in empire and type(empire[key]) is not int:
                     raise ValueError("Invalid empire statistic")
+            if "research_project" in empire and not isinstance(empire["research_project"], str):
+                raise ValueError("Invalid research project")
             ids.add(empire["id"])
         for event in events:
             if not isinstance(event, dict) or event.get("player") not in ids:

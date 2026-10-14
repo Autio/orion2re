@@ -1,4 +1,5 @@
 #include "pch.h"
+#include "spectator.h"
 
 namespace COMBFIND {
 
@@ -1631,12 +1632,20 @@ namespace COMBFIND {
             COMBFIND::messed_up_fleet_palette = 1;
         }
 
-        // Force strategic combat if no human players are involved
+        // Spectators may watch the existing tactical AI in tactical-mode games.
+        const bool watch_battle = spectator::Watch_Battles() && !plr1_is_human && !plr2_is_human;
+        // Preserve the original resolver unless explicitly watching.
         if (strategic_combat_flag == 0) {
-            if (!plr1_is_human && !plr2_is_human) {
+            if (!plr1_is_human && !plr2_is_human && !watch_battle) {
                 strategic_combat_flag = 1;
             }
         }
+
+        const std::string battle_location = colony_idx >= 0
+            ? HACCESS::Get_Planet_Name(MOX::colony[colony_idx].planet) : RUSS::Star_Name(star_idx);
+        spectator::Attack_Context attack_context(attacker_idx);
+        spectator::Battle_Event(attacker_idx, defender_idx, battle_location.c_str(),
+            attacker_count, defender_count, strategic_combat_flag == 0, 0, false);
 
         if (strategic_combat_flag != 0) {
             combat_result_code = COMBAT::Strategic_Combat(attacker_ships, attacker_count, defender_ships, defender_count, star_idx, colony_idx, results->info.summary, sizeof(results->info.summary), results->info.details, sizeof(results->info.details));
@@ -1690,6 +1699,8 @@ namespace COMBFIND {
             }
         }
 
+        spectator::Battle_Event(attacker_idx, defender_idx, battle_location.c_str(),
+            attacker_count, defender_count, strategic_combat_flag == 0, combat_result_code, true);
         MAINSCR::Update_Ship_Icons_In_Between_Turns();
 
         if (combat_result_code < 0) {
@@ -1979,6 +1990,7 @@ namespace COMBFIND {
         s_ship_data* ships = MOX::ship;
         int16_t ship_idx = *ship_list;
         int8_t attacker_id = ships[ship_idx].owner;
+        spectator::Attack_Context attack_context(attacker_id);
         s_colony* colony = &MOX::colony[colony_idx];
         int16_t planet_idx = colony->planet;
         int16_t star_idx = MOX::planet[planet_idx].star_index;

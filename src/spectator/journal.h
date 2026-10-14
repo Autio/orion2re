@@ -20,6 +20,8 @@ namespace spectator_journal {
         int population;
         int ships;
         bool eliminated;
+        std::string research_project;
+        int research_accumulated = 0;
     };
 
     struct s_turn {

@@ -110,6 +110,27 @@ class ChronicleTests(unittest.TestCase):
         self.journal.consume(snapshot(35167, events=[event]))
         self.assertIn("not a forecast of victory", self.journal.chronicle.entries[0][-1]["narrative"])
 
+    def test_named_world_event_and_non_empire_attacker_survive_replay(self):
+        event = dict(player=0, target=-1, kind="destruction",
+            text="Antarans destroyed the colony at Altair I, held by Alkari.",
+            evidence="Colony_Destroyed: planet=3; owner=0; attacker=8; loss_reason=1")
+        self.journal.consume(snapshot(35180, events=[event]))
+        self.assertEqual(self.journal.entries[0][-1]["text"], event["text"])
+        self.assertEqual(self.journal.chronicle.entries[0][-1]["narrative"], event["text"])
+        self.journal.consume(snapshot(35181, colonies=1, population=2))
+        self.assertIn("Altair I", self.journal.chronicle.entries[0][-1]["history"])
+        self.assertNotIn("destroyed the planet", self.journal.chronicle.entries[0][-1]["history"])
+
+    def test_research_metadata_is_optional_but_validated(self):
+        row = snapshot(35180)
+        row["empires"][0].update(research_project="Fusion Drive", research_accumulated=125)
+        self.journal.consume(row)
+        self.assertEqual(self.journal.latest["empires"][0]["research_project"], "Fusion Drive")
+        bad = copy.deepcopy(row)
+        bad["empires"][0]["research_project"] = {"unexpected": "object"}
+        with self.assertRaises(ValueError):
+            self.journal.consume(bad)
+
 
 if __name__ == "__main__":
     unittest.main()

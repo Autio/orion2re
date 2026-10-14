@@ -3,7 +3,8 @@ param(
     [string] $RuntimeDirectory,
     [string] $GameExecutable,
     [int] $Port = 8766,
-    [switch] $PrepareOnly
+    [switch] $PrepareOnly,
+    [switch] $WatchBattles
 )
 
 $ErrorActionPreference = 'Stop'
@@ -67,9 +68,11 @@ if ($server.HasExited) {
 }
 $oldJournal = $env:ORION2RE_JOURNAL
 $oldControl = $env:ORION2RE_STREAM_CONTROL
+$oldWatchBattles = $env:ORION2RE_WATCH_BATTLES
 try {
     $env:ORION2RE_JOURNAL = $journal
     $env:ORION2RE_STREAM_CONTROL = $control
+    $env:ORION2RE_WATCH_BATTLES = if ($WatchBattles) { '1' } else { '0' }
     $game = Start-Process -FilePath $destinationExe -WorkingDirectory $runtime -PassThru
 } catch {
     Stop-Process -Id $server.Id -ErrorAction SilentlyContinue
@@ -77,6 +80,7 @@ try {
 } finally {
     $env:ORION2RE_JOURNAL = $oldJournal
     $env:ORION2RE_STREAM_CONTROL = $oldControl
+    $env:ORION2RE_WATCH_BATTLES = $oldWatchBattles
 }
 Write-Output "Game PID: $($game.Id); stream server PID: $($server.Id)"
 Write-Output "Dashboard: http://127.0.0.1:$Port/"

@@ -43,7 +43,9 @@ namespace spectator_journal {
                 ",\"colonies\":" + std::to_string(empire.colonies) +
                 ",\"population\":" + std::to_string(empire.population) +
                 ",\"ships\":" + std::to_string(empire.ships) +
-                ",\"eliminated\":" + (empire.eliminated ? "true" : "false") + '}';
+                ",\"eliminated\":" + (empire.eliminated ? "true" : "false") +
+                ",\"research_project\":" + Quote_(empire.research_project) +
+                ",\"research_accumulated\":" + std::to_string(empire.research_accumulated) + '}';
         }
         result += "],\"events\":[";
         first = true;

@@ -1,4 +1,5 @@
 #include "pch.h"
+#include "spectator.h"
 
 namespace {
     constexpr int kPlayerRemapPaletteStart = 144;
@@ -840,7 +841,7 @@ namespace COMBINIT {
                     KEN::Ken_Get_Text_Message(0x52, msg_buf, 80);
                 }
                 palette::Refresh_Palette();
-                GENDRAW::Message_Box(msg_buf);
+                if (!spectator::Watch_Battles()) GENDRAW::Message_Box(msg_buf);
                 combat_winner = (int16_t)0xFFFF;
             }
         }

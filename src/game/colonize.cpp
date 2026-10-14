@@ -1,4 +1,5 @@
 #include "pch.h"
+#include "spectator.h"
 
 namespace COLONIZE {
     int16_t Star_N_Uncolonized_Planets(s_star_data* star) {
@@ -394,6 +395,7 @@ namespace COLONIZE {
 
         colony->producing[0] = COLONY_PRODUCTION_NONE;
         COLCALC::Compute_Star_Colony_Stuff(&MOX::star[planet->star_index]);
+        spectator::Colony_Founded(player_idx, planet_idx, is_outpost != 0);
     }
 
     void __cdecl Make_New_Colony(int16_t planet_idx, int16_t player_idx) {

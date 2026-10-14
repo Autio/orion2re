@@ -49,6 +49,9 @@ function render(state) {
       const stat = node("div", "stat"); stat.append(node("strong", "", value), node("span", "", label)); stats.append(stat);
     }
     head.append(title, stats);
+    if (empire.research_project) {
+      head.append(node("p", "research", `Research: ${empire.research_project} · ${empire.research_accumulated} RP accumulated`));
+    }
     const entries = node("div", "entries");
     const narrative = journalStyle === "chronicle";
     const summary = narrative && state.summaries?.[empire.id];
@@ -59,7 +62,7 @@ function render(state) {
     }
     const source = narrative ? state.chronicles : state.journals;
     const history = [...(source?.[empire.id] || [])].reverse().slice(0, overlay ? (narrative ? 3 : 5) : 20);
-    if (!history.length) entries.append(node("div", "empty", "No recorded diplomatic decisions yet. The empire's journal will appear here as decisions are made."));
+    if (!history.length) entries.append(node("div", "empty", "No recorded events yet. The empire's journal will appear here as the game unfolds."));
     for (const event of history) {
       const entry = node("div", "entry"), meta = node("div", "entry-meta");
       meta.append(node("span", "kind", event.kind), node("span", "", (event.stardate/10).toFixed(1)));

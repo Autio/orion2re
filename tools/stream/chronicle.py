@@ -106,6 +106,8 @@ class Chronicle:
                 narrative = event["text"] + " This is the moment of deliberation, before any agreement is secured. A favorable calculation is still only an opening; the outcome must earn its own entry."
             else:
                 narrative = event["text"]
+                if event["kind"] in ("colony", "destruction", "battle", "research"):
+                    self._remember(player, stardate, event["text"])
             self._add({**event, "source": "engine"}, stardate, narrative, context)
 
         for player, empire in roster.items():

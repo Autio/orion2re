@@ -1,9 +1,45 @@
 # Streaming spectator prototype
 
 This fork adds optional per-empire diplomacy journals and a local browser overlay.
-The existing AI still makes the decisions. The journal records evaluations,
-selected wars, and end-of-turn treaty/trade/research changes. It does not invent
-long-term plans, and it does not yet cover economic or military planning.
+The existing AI still makes the decisions. The journal records diplomacy,
+named colony events, space engagements, and acquired technologies. It does not
+invent long-term plans, and it does not yet explain economic or military planning.
+
+## Watching AI battles and following research
+
+Launch with `-WatchBattles` to let single-player ALLAI matches display AI-versus-AI
+engagements using the existing tactical engine and AI ship commands:
+
+```powershell
+.\tools\stream\start.ps1 -GameDataDirectory 'C:\Games\Master of Orion 2' -WatchBattles
+```
+
+The match must use tactical combat in its game settings. Strategic-mode games,
+multiplayer, and games with living human players keep their existing routing.
+Without the option, AI-versus-AI engagements retain strategic resolution.
+Equivalent environment setting: `ORION2RE_WATCH_BATTLES=1` alongside the journal
+environment variables. This changes which combat simulator resolves the battle;
+it is not a visual replay of a strategic result. Both sides remain AI-controlled.
+The existing combat animation settings control speed. Dashboard Pause stops
+future galaxy turns; it does not interrupt an ongoing tactical battle.
+
+New engine builds record colonization/outposts, ownership transfers, colony
+destruction versus planet destruction, and battle starts/results with named
+locations and participants. Destruction attribution comes from a scoped combat
+or post-combat attacker, including Antarans and monsters. Outside that scope the
+cause is explicitly unrecorded. Ownership changes are not automatically called
+conquests because they may also result from other transfers. Events are currently
+published at the end of the galaxy turn, not during individual ship actions.
+
+Each empire card shows its current research application and accumulated research
+points. Newly acquired technology applications enter the journal; their source
+is not inferred to be research, since trading, capture, and espionage also grant
+technologies. Repeated hyper-advanced levels and full interactive research-screen
+viewing are not yet exposed. Older journals remain readable, but cannot recover
+these newly instrumented events retroactively.
+
+Rebuild and relaunch the game to activate engine changes. Updating the dashboard
+alone cannot add hooks to an already-running executable.
 
 ## Journal styles
 
@@ -110,7 +146,9 @@ if it is forcibly killed, the game can retain the last playback setting.
 ## Data and limitations
 
 - `schema: 1` JSONL contains a session ID, the processed stardate, an empire roster,
-  and events tagged `evaluation`, `decision`, or `outcome`.
+  and events tagged `evaluation`, `decision`, `outcome`, `colony`, `destruction`,
+  `battle`, or `research`. The roster optionally includes `research_project` and
+  `research_accumulated`; older records without them remain supported.
 - Every event has its empire, target, readable text, and engine evidence. Initial
   proposal scores are explicitly not presented as completed agreements.
 - Roster statistics are omniscient broadcast information, separate from the AI's
@@ -180,3 +218,10 @@ Tests cover deterministic replay, past-only historical context, war duration,
 session resets, preservation of raw events, and elimination after a population
 of one. The live dashboard was checked with the existing match and playback
 remained at its five-second interval during the companion-server update.
+
+Battle/event extension validation: the complete Windows x64 Debug game builds;
+four journal unit cases (12 assertions), 18 Python tests, JavaScript syntax, and
+PowerShell launcher parsing pass. Named events and research cards were verified
+in the browser with explicitly illustrative data. A complete watched tactical
+battle has not yet been live-tested. The previously running game was left intact
+and still needs a relaunch to use this engine build.

@@ -27,3 +27,15 @@ DOCTEST_TEST_CASE("journal reports inaccessible output instead of claiming succe
     spectator_journal::s_turn turn;
     CHECK_FALSE(spectator_journal::Append_Turn("missing-journal-directory/output.jsonl", turn));
 }
+
+DOCTEST_TEST_CASE("research and named battle records preserve escaping and external attribution") {
+    spectator_journal::s_turn turn;
+    turn.empires.push_back({0, "Alkari", 4, 1, 8, 2, false, "Fusion \"Drive\"", 125});
+    spectator_journal::Add_Event(&turn, {0, -1, "destruction",
+        "Antarans destroyed the colony at Altair I.", "attacker=8; planet=3; loss_reason=1"});
+    const auto json = spectator_journal::Serialize_Turn(turn);
+    CHECK(json.find("\"research_project\":\"Fusion \\\"Drive\\\"\"") != std::string::npos);
+    CHECK(json.find("\"research_accumulated\":125") != std::string::npos);
+    CHECK(json.find("\"target\":-1") != std::string::npos);
+    CHECK(json.find("attacker=8; planet=3; loss_reason=1") != std::string::npos);
+}
