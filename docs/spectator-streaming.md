@@ -148,3 +148,10 @@ to the dashboard. Autoplay advanced turns; a pause check held stardate 35013
 across repeated reads and resume continued the game. The launcher passed parsing,
 runtime-preparation, and existing-config preservation checks. A complete match,
 combat interruption behavior, and elimination handling remain unverified.
+
+The live run subsequently reached stardate 35137 with no journal parse errors.
+At 35111, the Meklar's war-selection decision (`reason=23`) and the resulting
+Meklar/Klackon treaty changes (`0 -> 4`) appeared in the actual browser journal.
+The simulation continued afterward. The dashboard's Pause button stopped it at
+35137, verified through repeated journal reads. This validates the real
+engine-to-browser event path, not just sample data.
