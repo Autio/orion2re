@@ -1,4 +1,5 @@
 #include "pch.h"
+#include "spectator.h"
 
 namespace {
     int32_t Tech_Trade_Value(
@@ -361,6 +362,7 @@ namespace npcdiplo {
                     if (MOX::player[j].objectives == PLAYER_OBJECTIVE_HUMAN) {
                         diplomac::Change_Relations(-10000, j, i, reason[j], 0, 0);
                     }
+                    spectator::War_Selected(i, j, reason[j]);
                     diplomac::Declare_War(i, j);
                 }
             }
@@ -387,6 +389,7 @@ namespace npcdiplo {
                             if (MOX::player[j].objectives == PLAYER_OBJECTIVE_HUMAN) {
                                 diplomac::Change_Relations(-10000, j, i, reason[j], 0, 0);
                             }
+                            spectator::War_Selected(i, j, reason[j]);
                             diplomac::Declare_War(i, j);
                             break;
                         }

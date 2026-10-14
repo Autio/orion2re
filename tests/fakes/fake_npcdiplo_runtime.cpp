@@ -57,3 +57,7 @@ namespace newtech {
         return tech_value;
     }
 }
+namespace spectator {
+    void Proposal_Evaluated(int, int, int, int) {}
+    void War_Selected(int, int, int) {}
+}

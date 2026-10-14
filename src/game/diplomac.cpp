@@ -1,4 +1,5 @@
 #include "pch.h"
+#include "spectator.h"
 
 #include <algorithm>
 
@@ -3539,6 +3540,8 @@ namespace diplomac {
         }
 
         score += COLCALC::Best_Leader_Diplomat_Bonus(proposer_idx);
+
+        spectator::Proposal_Evaluated(evaluator_idx, proposer_idx, treaty_type, score);
 
         if (score < -75) {
             return 0;

@@ -1,4 +1,5 @@
 #include "pch.h"
+#include "spectator.h"
 
 #include "lua/lua_game.h"
 
@@ -96,6 +97,7 @@ namespace NEXTTURN {
             fields::Assign_Auto_Function(SCORE::nullsub, 1);
         }
 
+        spectator::Begin_Turn();
         MSG_::Allocate_Msg_Slots();
 
         if (MOX::settings.xenons_exist != 0 && MOX::antarans.field6_0x3c == 0) {
@@ -193,6 +195,7 @@ namespace NEXTTURN {
         }
 
         BILL::Record_History();
+        spectator::End_Turn();
         MOX::stardate++;
 
         if (MAINSCR::in_auto_next_turn_mode == 0) {

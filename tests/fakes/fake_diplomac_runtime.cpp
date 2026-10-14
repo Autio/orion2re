@@ -64,3 +64,7 @@ namespace npcdiplo {
         *tech_count = 0;
     }
 }
+namespace spectator {
+    void Proposal_Evaluated(int, int, int, int) {}
+    void War_Selected(int, int, int) {}
+}

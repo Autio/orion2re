@@ -1977,3 +1977,14 @@ orion2re_add_unit_test(test_router_client
         orion2re_lz4
     LINK_SDL
 )
+add_executable(test_spectator_journal
+    tests/test_main.cpp
+    tests/unit/spectator_journal_test.cpp
+    src/spectator/journal.cpp
+)
+target_compile_features(test_spectator_journal PRIVATE cxx_std_20)
+target_include_directories(test_spectator_journal PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}/src"
+    "${ORION2RE_VENDORED_DOCTEST_DIR}"
+)
+add_test(NAME test_spectator_journal COMMAND test_spectator_journal)

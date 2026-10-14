@@ -1,4 +1,5 @@
 #include "pch.h"
+#include "spectator.h"
 
 #include "game/config_refresh.h"
 
@@ -426,15 +427,10 @@ namespace MAINSCR {
                 }
             }
 
-            if (RUSS::all_ai_game != 0) {
-                // Disabled on purpose so all-AI mode can remain on the main screen
-                // without automatically advancing the turn.
-                // video::Set_Page_Off();
-                // MAINSCR::Draw_Main_Screen();
-                // RUSS::Mox_Sync_Update();
-                // input = next_button;
+            if (input == 0 && spectator::Should_Advance()) {
+                input = next_button;
             }
-            if (MOX::player[MOX::PLAYER_NUM].surrender_to != -1) {
+            if (MOX::player[MOX::PLAYER_NUM].surrender_to != -1 && !spectator::Owns_Playback()) {
                 video::Set_Page_Off();
                 MAINSCR::Draw_Main_Screen();
                 RUSS::Mox_Sync_Update();

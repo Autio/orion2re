@@ -1,4 +1,5 @@
 #include "pch.h"
+#include "spectator.h"
 
 namespace RUSS {
     int8_t all_ai_game;
@@ -114,6 +115,7 @@ namespace RUSS {
             }
 
             NETMOX::net.all_ai_game_sync_flag = 1;
+            spectator::Start_Session();
         } else {
             GENDRAW::Message_Box((char*)"This isn't a single player game, cheeky monkey!");
         }

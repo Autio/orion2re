@@ -1,5 +1,9 @@
 # orion2re
 
+This fork is developing self-playing broadcasts with per-empire decision journals.
+See [the spectator streaming prototype](docs/spectator-streaming.md) for the
+browser overlay, local demo, live-game setup, and current limitations.
+
 This project is a restoration effort for the Master of Orion II game engine. Check our [documentation portal](https://moo2mod.com/redone/doc/) too.
 
 The game is fully playable and includes all bug fixes and optional community improvements up to the latest version of the unofficial 1.50 patch.
