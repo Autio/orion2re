@@ -24,8 +24,8 @@ namespace TEST_EVENTS {
         event_message[0] = '\0';
 
         for (s_star_data& star : stars) {
-            for (int16_t& planet_idx : star.planet_index) {
-                planet_idx = -1;
+            for (int index = 0; index < 5; ++index) {
+                star.planet_index[index] = -1;
             }
         }
         for (s_planet_data& planet : planets) {

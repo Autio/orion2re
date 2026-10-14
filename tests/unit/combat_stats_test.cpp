@@ -1085,7 +1085,7 @@ DOCTEST_TEST_CASE("strict combat wait cost saturates at remaining movement") {
     DOCTEST_REQUIRE(COMBAT1::Select_Next_Strict_Ship(COMBAT_SHIP_ACTION_NONE) == 0);
     DOCTEST_REQUIRE(MOX::cur_ship == 1);
     DOCTEST_CHECK(COMBAT1::Select_Next_Strict_Ship(COMBAT_SHIP_ACTION_WAIT) == 0);
-    DOCTEST_CHECK(MOX::combat_data[1].movement_left == 0);
+    DOCTEST_CHECK((MOX::combat_data[1].movement_left == 0));
 }
 
 DOCTEST_TEST_CASE("strict combat wait charges each ship only once") {
@@ -1094,12 +1094,12 @@ DOCTEST_TEST_CASE("strict combat wait charges each ship only once") {
 
     DOCTEST_REQUIRE(COMBAT1::Select_Next_Strict_Ship(COMBAT_SHIP_ACTION_NONE) == 0);
     DOCTEST_REQUIRE(COMBAT1::Select_Next_Strict_Ship(COMBAT_SHIP_ACTION_WAIT) == 0);
-    DOCTEST_CHECK(MOX::combat_data[1].movement_left == 6);
+    DOCTEST_CHECK((MOX::combat_data[1].movement_left == 6));
     DOCTEST_REQUIRE(COMBAT1::Select_Next_Strict_Ship(COMBAT_SHIP_ACTION_WAIT) == 0);
     DOCTEST_REQUIRE(COMBAT1::Select_Next_Strict_Ship(COMBAT_SHIP_ACTION_WAIT) == 0);
     DOCTEST_REQUIRE(MOX::cur_ship == 3);
     DOCTEST_CHECK(COMBAT1::Select_Next_Strict_Ship(COMBAT_SHIP_ACTION_WAIT) == 0);
-    DOCTEST_CHECK(MOX::combat_data[3].movement_left == 6);
+    DOCTEST_CHECK((MOX::combat_data[3].movement_left == 6));
 }
 
 DOCTEST_TEST_CASE("strict automatic wait cost is deferred until the wait stage") {
@@ -1111,10 +1111,10 @@ DOCTEST_TEST_CASE("strict automatic wait cost is deferred until the wait stage")
     DOCTEST_REQUIRE(COMBAT1::Select_Next_Strict_Ship(COMBAT_SHIP_ACTION_NONE) == 0);
     DOCTEST_REQUIRE(MOX::cur_ship == 1);
     DOCTEST_REQUIRE(COMBAT1::Select_Next_Strict_Ship(COMBAT_SHIP_ACTION_AUTOMATIC) == 0);
-    DOCTEST_CHECK(MOX::combat_data[1].movement_left == 10);
+    DOCTEST_CHECK((MOX::combat_data[1].movement_left == 10));
     DOCTEST_REQUIRE(COMBAT1::Select_Next_Strict_Ship(COMBAT_SHIP_ACTION_DONE) == 0);
     DOCTEST_REQUIRE(COMBAT1::Select_Next_Strict_Ship(COMBAT_SHIP_ACTION_DONE) == 0);
-    DOCTEST_CHECK(MOX::combat_data[1].movement_left == 6);
+    DOCTEST_CHECK((MOX::combat_data[1].movement_left == 6));
 }
 
 DOCTEST_TEST_CASE("strict sequencing includes ships restored during the wait stage") {
@@ -1162,8 +1162,8 @@ DOCTEST_TEST_CASE("strict side wait moves every remaining friendly ship to the w
     DOCTEST_REQUIRE(COMBAT1::Select_Next_Strict_Ship(
                         COMBAT_SHIP_ACTION_SIDE_WAIT) == 0);
     DOCTEST_CHECK(MOX::cur_ship == 2);
-    DOCTEST_CHECK(MOX::combat_data[1].movement_left == 6);
-    DOCTEST_CHECK(MOX::combat_data[3].movement_left == 6);
+    DOCTEST_CHECK((MOX::combat_data[1].movement_left == 6));
+    DOCTEST_CHECK((MOX::combat_data[3].movement_left == 6));
 }
 
 DOCTEST_TEST_CASE("strict side wait records stasis ships before functional selection") {
@@ -1177,14 +1177,14 @@ DOCTEST_TEST_CASE("strict side wait records stasis ships before functional selec
     DOCTEST_REQUIRE(COMBAT1::Select_Next_Strict_Ship(
                         COMBAT_SHIP_ACTION_SIDE_WAIT) == 0);
     DOCTEST_CHECK(MOX::cur_ship == 2);
-    DOCTEST_CHECK(MOX::combat_data[3].movement_left == 6);
+    DOCTEST_CHECK((MOX::combat_data[3].movement_left == 6));
     DOCTEST_CHECK(MOX::ship_turn_order[2] == -1);
 
     MOX::combat_data[3].stasis_source_idx = COMBAT_SHIP_NONE;
     DOCTEST_REQUIRE(COMBAT1::Select_Next_Strict_Ship(
                         COMBAT_SHIP_ACTION_DONE) == 0);
     DOCTEST_CHECK(MOX::cur_ship == 3);
-    DOCTEST_CHECK(MOX::combat_data[3].movement_left == 6);
+    DOCTEST_CHECK((MOX::combat_data[3].movement_left == 6));
     DOCTEST_CHECK_FALSE(COMBAT1::Combat_Side_Wait_Is_Available());
 }
 
@@ -1205,7 +1205,7 @@ DOCTEST_TEST_CASE("strict side-waited stasis ships remain in the wait stage") {
     DOCTEST_REQUIRE(COMBAT1::Select_Next_Strict_Ship(
                         COMBAT_SHIP_ACTION_DONE) == 0);
     DOCTEST_CHECK(MOX::cur_ship == 3);
-    DOCTEST_CHECK(MOX::combat_data[3].movement_left == 6);
+    DOCTEST_CHECK((MOX::combat_data[3].movement_left == 6));
 }
 
 DOCTEST_TEST_CASE("strict side wait in the wait stage is a safe no-op") {
@@ -1224,7 +1224,7 @@ DOCTEST_TEST_CASE("strict side wait in the wait stage is a safe no-op") {
                       COMBAT_SHIP_ACTION_SIDE_WAIT) == 0);
     DOCTEST_CHECK(MOX::cur_ship == 3);
     DOCTEST_CHECK(MOX::cur_ptr == pointer);
-    DOCTEST_CHECK(MOX::combat_data[3].movement_left == movement);
+    DOCTEST_CHECK((MOX::combat_data[3].movement_left == movement));
 }
 
 DOCTEST_TEST_CASE("strict exhaustion clears cursors and writes the queue sentinel") {
@@ -1825,9 +1825,9 @@ DOCTEST_TEST_CASE("simulated rotation restores missile bearing") {
     int16_t target_facing = 1;
     CMBTMOV1::Rotate_Ship_Until_Impact(0, &target_facing);
 
-    DOCTEST_CHECK(MOX::missile[0].x == 100);
-    DOCTEST_CHECK(MOX::missile[0].y == 50);
-    DOCTEST_CHECK(MOX::missile[0].travel_dist == 60);
+    DOCTEST_CHECK((MOX::missile[0].x == 100));
+    DOCTEST_CHECK((MOX::missile[0].y == 50));
+    DOCTEST_CHECK((MOX::missile[0].travel_dist == 60));
     DOCTEST_CHECK(MOX::missile[0].facing_dir == 3);
 }
 
@@ -2135,8 +2135,8 @@ DOCTEST_TEST_CASE("simulated movement restores missile bearing") {
     CMBTMOV1::Test_Move_Until_Impact(
         0, &destination_x, &destination_y, &destination_facing);
 
-    DOCTEST_CHECK(MOX::missile[0].x == 100);
-    DOCTEST_CHECK(MOX::missile[0].y == 50);
-    DOCTEST_CHECK(MOX::missile[0].travel_dist == 60);
+    DOCTEST_CHECK((MOX::missile[0].x == 100));
+    DOCTEST_CHECK((MOX::missile[0].y == 50));
+    DOCTEST_CHECK((MOX::missile[0].travel_dist == 60));
     DOCTEST_CHECK(MOX::missile[0].facing_dir == 3);
 }

@@ -82,7 +82,7 @@ DOCTEST_TEST_CASE("mark stack accepts forty pushes and rejects push forty-one") 
         allocate::Push_Block(block);
 
         DOCTEST_CHECK(allocate::mark_stack_pos[0] == i + 1);
-        DOCTEST_CHECK(allocate::mark_stack[i].block == block);
+        DOCTEST_CHECK((allocate::mark_stack[i].block == block));
         DOCTEST_CHECK(
             allocate::mark_stack[i].current == static_cast<uint32_t>(i));
     }

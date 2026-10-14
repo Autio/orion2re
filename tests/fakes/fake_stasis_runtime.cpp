@@ -44,7 +44,7 @@ namespace TEST_STASIS {
         capture_internal_damage = false;
         captured_internal_damage = 0;
         random_value = 100;
-        beam_target_range = 9;
+        beam_target_range = 8;
         CMBTFIRE::hit_threshold_fixed_value = 40;
         CMBTFIRE::ion_affects_antarans = 0;
         TECHDATA::esd_bonus = 100;

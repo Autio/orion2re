@@ -214,9 +214,9 @@ DOCTEST_TEST_CASE("tactical bombardment advances only torpedo cooldown") {
 
     const s_combat_data* ship = &combat_data[1];
     DOCTEST_CHECK(ship->weapons[0].ammo == 20);
-    DOCTEST_CHECK(ship->weapons[1].ammo == 20);
+    DOCTEST_CHECK((ship->weapons[1].ammo == 20));
     DOCTEST_CHECK(ship->weapons[2].ammo == 10);
-    DOCTEST_CHECK(ship->weapons[3].ammo == 20);
+    DOCTEST_CHECK((ship->weapons[3].ammo == 20));
 }
 
 DOCTEST_TEST_CASE("tactical bombardment refreshes attacker fighter weapons") {
@@ -283,25 +283,25 @@ DOCTEST_TEST_CASE("strategic attacks use strategic weapon damage") {
     qcombat_data[target_idx].max_hits = 30000;
 
     COMBAT::Beam_Attack(attacker_idx, target_idx);
-    DOCTEST_CHECK(qcombat_data[target_idx].structural_damage == 7);
+    DOCTEST_CHECK((qcombat_data[target_idx].structural_damage == 7));
 
     qcombat_data[target_idx].structural_damage = 0;
     COMBAT::Missile_Attack(attacker_idx, target_idx);
-    DOCTEST_CHECK(qcombat_data[target_idx].structural_damage == 7);
+    DOCTEST_CHECK((qcombat_data[target_idx].structural_damage == 7));
 
     qcombat_data[target_idx].structural_damage = 0;
     COMBAT::Strat_Special_Attack(attacker_idx, target_idx);
-    DOCTEST_CHECK(qcombat_data[target_idx].structural_damage == 7);
+    DOCTEST_CHECK((qcombat_data[target_idx].structural_damage == 7));
 
     qcombat_data[target_idx].structural_damage = 0;
     COMBAT::Strat_Bomb_Attack(attacker_idx);
-    DOCTEST_CHECK(qcombat_data[target_idx].structural_damage == 7);
+    DOCTEST_CHECK((qcombat_data[target_idx].structural_damage == 7));
 
     qcombat_data[target_idx].structural_damage = 0;
     TECHDATA::weapons[WEAPON_STELLAR_CONVERTER].max_damage = 200;
     TECHDATA::weapons[WEAPON_STELLAR_CONVERTER].strat_max_damage = 9;
     COMBAT::Stellar_Converter_Attack(target_idx);
-    DOCTEST_CHECK(qcombat_data[target_idx].structural_damage == 36);
+    DOCTEST_CHECK((qcombat_data[target_idx].structural_damage == 36));
 }
 
 DOCTEST_TEST_CASE("strategic beam damage passes each hit through the Lua rule boundary") {
@@ -324,7 +324,7 @@ DOCTEST_TEST_CASE("strategic beam damage passes each hit through the Lua rule bo
 
     COMBAT::Beam_Attack(attacker_idx, target_idx);
 
-    DOCTEST_CHECK(qcombat_data[target_idx].structural_damage == 12);
+    DOCTEST_CHECK((qcombat_data[target_idx].structural_damage == 12));
     DOCTEST_CHECK(TEST_COMBAT_BEAM_DAMAGE::Calls_() == 1);
     const auto& context = TEST_COMBAT_BEAM_DAMAGE::Context_(0);
     DOCTEST_CHECK(context.attacker_player_id == kAttacker);
@@ -357,9 +357,9 @@ DOCTEST_TEST_CASE("strategic beam damage context follows salvo retargeting") {
 
     COMBAT::Beam_Attack(attacker_idx, first_target_idx);
 
-    DOCTEST_CHECK(qcombat_data[first_target_idx].structural_damage == 7);
+    DOCTEST_CHECK((qcombat_data[first_target_idx].structural_damage == 7));
     DOCTEST_CHECK(qcombat_data[first_target_idx].status == 1);
-    DOCTEST_CHECK(qcombat_data[second_target_idx].structural_damage == 7);
+    DOCTEST_CHECK((qcombat_data[second_target_idx].structural_damage == 7));
     DOCTEST_CHECK(TEST_COMBAT_BEAM_DAMAGE::Calls_() == 2);
     const auto& first = TEST_COMBAT_BEAM_DAMAGE::Context_(0);
     const auto& second = TEST_COMBAT_BEAM_DAMAGE::Context_(1);
@@ -407,7 +407,7 @@ DOCTEST_TEST_CASE("strategic missile attacks use configured scanner reductions")
 
         COMBAT::Missile_Attack(attacker_idx, target_idx);
 
-        DOCTEST_CHECK(qcombat_data[target_idx].structural_damage == 0);
+        DOCTEST_CHECK((qcombat_data[target_idx].structural_damage == 0));
     }
 }
 
