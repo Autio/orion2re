@@ -3200,8 +3200,8 @@ namespace MAINSCR {
                 font_colors.colors[7] = 22;
 
                 if (FLEETPOP::Some_Icon_Selected()) {
-                    int16_t selected_ship_ids[MAX_SHIPS];
-                    HACCESS::Get_Fleet_Box_Selected_Ship_Ids(selected_ship_ids, MAX_SHIPS, 0xFF);
+                    int16_t selected_ship_ids[SHIP_LIST_CAPACITY];
+                    HACCESS::Get_Fleet_Box_Selected_Ship_Ids(selected_ship_ids, SHIP_LIST_CAPACITY, 0xFF);
                     SHIPMOVE::Ships_Try_To_Move_To(selected_ship_ids, star_idx, &MOX::g_ship_move_info);
                     moving_a_stack = 1;
                 }

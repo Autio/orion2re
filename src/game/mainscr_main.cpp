@@ -282,7 +282,7 @@ namespace MAINSCR {
         int16_t m_ship_idx = 0;
         int16_t ship_idx = 0;
 
-        int16_t ship_ids[MAX_SHIPS];
+        int16_t ship_ids[SHIP_LIST_CAPACITY];
         char text_buffer[256];
         char msg_buffer[512];
 
@@ -498,7 +498,7 @@ namespace MAINSCR {
 
                     if (icon_selected_flag) {
                         if (selected_target_id > -1 && mouse_status == 0 && MOX::star[selected_target_id].spectral_class != STAR_CLASS_BLACK_HOLE) {
-                            HACCESS::Get_Fleet_Box_Selected_Ship_Ids(ship_ids, MAX_SHIPS, 0xff);
+                            HACCESS::Get_Fleet_Box_Selected_Ship_Ids(ship_ids, SHIP_LIST_CAPACITY, 0xff);
                             SHIPMOVE::Ships_Try_To_Move_To(ship_ids, selected_target_id, &MOX::g_ship_move_info);
 
                             if (MOX::g_ship_move_info.moving == 0) {

@@ -256,6 +256,34 @@ DOCTEST_TEST_CASE("splitting an in-flight fleet recalculates the remaining ships
     DOCTEST_CHECK(MOX::ship[1].travelling_speed == 4);
 }
 
+DOCTEST_TEST_CASE("joining an in-flight fleet keeps its target list terminated") {
+    TEST_SHIPMOVE::Reset_();
+
+    MOX::NUM_SHIPS = 4;
+    MOX::NUM_STARS = 3;
+    MOX::star[2].x = 180;
+    for (int16_t i = 0; i < MOX::NUM_SHIPS; ++i) {
+        s_ship_data& ship = MOX::ship[i];
+        ship.owner = 0;
+        ship.officer_index = -1;
+        ship.x = 30;
+        ship.y = 0;
+    }
+    for (int16_t i = 1; i < MOX::NUM_SHIPS; ++i) {
+        MOX::ship[i].status = 1;
+        MOX::ship[i].location = SHIP_LOCATION_MOVING_OFFSET + (i == 3 ? 1 : 2);
+        MOX::ship[i].travelling_speed = 4;
+    }
+
+    int16_t ship_list[] = {0, -1};
+    s_ship_move_info move_info = {};
+    DOCTEST_REQUIRE(SHIPMOVE::Apply_Player_Movement_Order(ship_list, 2, &move_info));
+    DOCTEST_CHECK(SHIPMOVE::Ship_Destination_Star(&MOX::ship[0]) == 2);
+    DOCTEST_CHECK(SHIPMOVE::Ship_Destination_Star(&MOX::ship[1]) == 2);
+    DOCTEST_CHECK(SHIPMOVE::Ship_Destination_Star(&MOX::ship[2]) == 2);
+    DOCTEST_CHECK(SHIPMOVE::Ship_Destination_Star(&MOX::ship[3]) == 1);
+}
+
 DOCTEST_TEST_CASE("complete in-flight fleet can return to its prior jump gate destination once in the same turn") {
     TEST_SHIPMOVE::Reset_();
 

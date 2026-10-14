@@ -732,6 +732,7 @@ namespace SHIPMOVE {
                     target_baseline = i;
                 }
                 target_list[target_count++] = i;
+                target_list[target_count] = -1;
             }
         }
         target_list[target_count] = -1;

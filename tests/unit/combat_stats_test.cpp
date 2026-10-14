@@ -669,6 +669,7 @@ DOCTEST_TEST_CASE("disabled spent weapons remain red") {
     memset(players, 0, sizeof(players));
     memset(TECHDATA::weapons, 0, sizeof(TECHDATA::weapons));
 
+    MOX::combat_total_ship_count = 1;
     MOX::cur_ship = 0;
     MOX::auto_combat = 0;
     MOX::take_control_flag = 0;
@@ -705,6 +706,16 @@ DOCTEST_TEST_CASE("disabled spent weapons remain red") {
     DOCTEST_REQUIRE(font_style_selected);
     for (int i = 0; i < 8; ++i) {
         DOCTEST_CHECK(selected_font_colors.colors[i] == expected_colors[i]);
+    }
+}
+
+DOCTEST_TEST_CASE("weapon status is empty without a selected ship") {
+    MOX::combat_total_ship_count = 1;
+    for (int16_t cur_ship : {-1, 1}) {
+        MOX::cur_ship = cur_ship;
+        font_style_selected = false;
+        CMBTDRW1::Draw_Weapon_Status_Display(-1, -1);
+        DOCTEST_CHECK_FALSE(font_style_selected);
     }
 }
 
