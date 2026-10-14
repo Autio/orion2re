@@ -107,7 +107,7 @@ DOCTEST_TEST_CASE("Anti-Missile Rockets use the executable hit threshold") {
 
         CMBTSPEC::Anti_Missile_Rockets(0, 0, 0, 0, 0, 0);
 
-        DOCTEST_CHECK(MOX::missile[0].quantity == test_case.expected_quantity);
+        DOCTEST_CHECK((MOX::missile[0].quantity == test_case.expected_quantity));
         DOCTEST_CHECK(MOX::combat_data[0].weapons[0].shots_left == 0);
         DOCTEST_CHECK(MOX::combat_data[0].weapons[0].ammo == 0);
         DOCTEST_CHECK(TEST_CMBTSPEC::Random_Call_Count_() == 1);
@@ -137,8 +137,8 @@ DOCTEST_TEST_CASE("Proton Torpedo launch distance follows speed-base mode") {
 
         CMBTSPEC::Missile_Launch_FX(0, 0, 0, 0);
 
-        DOCTEST_CHECK(MOX::missile[0].travel_dist ==
-            test_case.expected_travel_distance);
+        DOCTEST_CHECK((MOX::missile[0].travel_dist ==
+            test_case.expected_travel_distance));
         DOCTEST_CHECK(TEST_CMBTSPEC::Missile_Move_Call_Count_() == 1);
         DOCTEST_CHECK(TEST_CMBTSPEC::Missile_Resolve_Call_Count_() == 1);
     }
@@ -152,7 +152,7 @@ DOCTEST_TEST_CASE("Dragon Breath keeps its independent instant launch distance")
 
     CMBTSPEC::Missile_Launch_FX(0, 0, 0, 0);
 
-    DOCTEST_CHECK(MOX::missile[0].travel_dist == 10000);
+    DOCTEST_CHECK((MOX::missile[0].travel_dist == 10000));
     DOCTEST_CHECK(TEST_CMBTSPEC::Missile_Move_Call_Count_() == 1);
     DOCTEST_CHECK(TEST_CMBTSPEC::Missile_Resolve_Call_Count_() == 1);
 }

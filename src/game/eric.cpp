@@ -32,13 +32,17 @@ namespace ERIC {
         fade_speed.fade_out = percentage;
     }
 
-    int16_t __cdecl Get_Sint_Index_From_List(int16_t value, const int16_t* list, uint16_t count) {
+    int16_t __cdecl Get_Sint_Index_From_List(int16_t value, const void* list, uint16_t count) {
         if (count == 0) {
             return -1;
         }
 
+        // Callers pass arrays from packed records, so copy each element out
+        // rather than reading through a possibly misaligned int16_t pointer.
+        const uint8_t* bytes = (const uint8_t*)list;
         for (uint16_t i = 0; i < count; ++i) {
-            if (list[i] == value) {
+            const int16_t element = unaligned::Load<int16_t>(bytes + i * sizeof(int16_t));
+            if (element == value) {
                 return (int16_t)i;
             }
         }

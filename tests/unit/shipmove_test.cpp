@@ -39,7 +39,7 @@ DOCTEST_TEST_CASE("movement to assigned planet star keeps auto-colonization") {
 
         SHIPMOVE::Make_Ships_Move_To(ship_list, 7, &move_info);
 
-        DOCTEST_CHECK(MOX::ship[0].location == test_case.expected_location);
+        DOCTEST_CHECK((MOX::ship[0].location == test_case.expected_location));
         DOCTEST_CHECK(MOX::ship[0].d.ship_weapon[0].type == 3);
         DOCTEST_CHECK(MOX::ship[0].d.ship_weapon[1].type == 1);
     }
@@ -306,14 +306,14 @@ DOCTEST_TEST_CASE("complete in-flight fleet can return to its prior jump gate de
     s_ship_move_info move_info;
     DOCTEST_REQUIRE(SHIPMOVE::Apply_Player_Movement_Order(complete_fleet, 2, &move_info));
     DOCTEST_CHECK(move_info.has_jumpgate_route == 0);
-    DOCTEST_CHECK(MOX::ship[0].prior_jump_gate_destination == 1);
-    DOCTEST_CHECK(MOX::ship[1].prior_jump_gate_destination == 1);
+    DOCTEST_CHECK((MOX::ship[0].prior_jump_gate_destination == 1));
+    DOCTEST_CHECK((MOX::ship[1].prior_jump_gate_destination == 1));
 
     DOCTEST_REQUIRE(SHIPMOVE::Apply_Player_Movement_Order(complete_fleet, 1, &move_info));
     DOCTEST_CHECK(move_info.has_jumpgate_route == 1);
     DOCTEST_CHECK(move_info.traveling_speed == 7);
-    DOCTEST_CHECK(MOX::ship[0].prior_jump_gate_destination == -1);
-    DOCTEST_CHECK(MOX::ship[1].prior_jump_gate_destination == -1);
+    DOCTEST_CHECK((MOX::ship[0].prior_jump_gate_destination == -1));
+    DOCTEST_CHECK((MOX::ship[1].prior_jump_gate_destination == -1));
 }
 
 DOCTEST_TEST_CASE("prior jump gate destination does not grant a partial fleet or survive the turn") {
@@ -343,8 +343,8 @@ DOCTEST_TEST_CASE("prior jump gate destination does not grant a partial fleet or
 
     DOCTEST_REQUIRE(SHIPMOVE::Apply_Player_Movement_Order(partial_fleet, 1, &move_info));
     DOCTEST_CHECK(move_info.has_jumpgate_route == 0);
-    DOCTEST_CHECK(MOX::ship[0].prior_jump_gate_destination == -1);
-    DOCTEST_CHECK(MOX::ship[1].prior_jump_gate_destination == -1);
+    DOCTEST_CHECK((MOX::ship[0].prior_jump_gate_destination == -1));
+    DOCTEST_CHECK((MOX::ship[1].prior_jump_gate_destination == -1));
 
     int16_t complete_fleet[] = {0, 1, -1};
     for (int16_t i = 0; i < MOX::NUM_SHIPS; ++i) {
@@ -371,7 +371,7 @@ DOCTEST_TEST_CASE("unstable wormhole accepts a fleet with one turn remaining") {
 
     DOCTEST_CHECK(result.success == 1);
     DOCTEST_CHECK(MOX::ship[0].status == 0);
-    DOCTEST_CHECK(MOX::ship[0].location == 1);
+    DOCTEST_CHECK((MOX::ship[0].location == 1));
 }
 
 DOCTEST_TEST_CASE("unstable wormhole excludes a fleet already arriving") {

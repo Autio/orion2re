@@ -127,8 +127,8 @@ DOCTEST_TEST_CASE("Computer Virus preserves unsigned configuration values") {
 
         DOCTEST_CHECK(event.target_id == test_case.expected_loss);
         DOCTEST_CHECK(event.amount == 3);
-        DOCTEST_CHECK(MOX::player[0].research_accumulated ==
-            test_case.expected_research);
+        DOCTEST_CHECK((MOX::player[0].research_accumulated ==
+            test_case.expected_research));
         DOCTEST_CHECK(event.status == 5);
     }
 }

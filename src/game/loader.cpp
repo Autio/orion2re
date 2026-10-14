@@ -102,7 +102,7 @@ namespace LOADER {
 
     void __cdecl Load_Pictures() {
         MOX::screen_seg = (s_animation_header*)MOX::global_screen_seg;
-        memset(Animation_Frame_Offsets_((s_animation_header*)MOX::screen_seg), 0, sizeof(uint32_t) * 5);
+        memset(Animation_Frame_Table_((s_animation_header*)MOX::screen_seg), 0, sizeof(uint32_t) * 5);
         Load_Main_Screen_Pictures();
         RUSS::Mox_Update();
         TECHINIT::Init_Tech();

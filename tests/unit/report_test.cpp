@@ -48,7 +48,7 @@ DOCTEST_TEST_CASE("leader offers preserve classic decline behavior by default") 
     DOCTEST_CHECK(REPORT::Has_Officer_For_Hire(0, 1) == 1);
     DOCTEST_CHECK(MOX::leaders[3].status == 4);
     DOCTEST_CHECK(MOX::leaders[3].player_index == 0);
-    DOCTEST_CHECK(MOX::player[0].stardate_last_offered_hero == 35005);
+    DOCTEST_CHECK((MOX::player[0].stardate_last_offered_hero == 35005));
     DOCTEST_CHECK(MOX::player[0].officer_for_hire == -1);
 }
 
@@ -63,9 +63,9 @@ DOCTEST_TEST_CASE("declining a leader offer keeps it hireable without resetting 
     DOCTEST_CHECK(REPORT::Has_Officer_For_Hire(0, 1) == 1);
     DOCTEST_CHECK(MOX::leaders[3].status == 4);
     DOCTEST_CHECK(MOX::leaders[3].player_index == 0);
-    DOCTEST_CHECK(MOX::leaders[3].xp == 60);
+    DOCTEST_CHECK((MOX::leaders[3].xp == 60));
     DOCTEST_CHECK(MOX::leaders[3].eta == 0);
-    DOCTEST_CHECK(MOX::player[0].stardate_last_offered_hero == 35001);
+    DOCTEST_CHECK((MOX::player[0].stardate_last_offered_hero == 35001));
     DOCTEST_CHECK(MOX::player[0].officer_for_hire == -1);
 }
 
@@ -81,8 +81,8 @@ DOCTEST_TEST_CASE("accepting a leader into the pool records its offer date") {
     DOCTEST_CHECK(REPORT::Has_Officer_For_Hire(0, 1) == 1);
     DOCTEST_CHECK(MOX::leaders[3].status == 0);
     DOCTEST_CHECK(MOX::leaders[3].player_index == 0);
-    DOCTEST_CHECK(MOX::leaders[3].xp == 0);
-    DOCTEST_CHECK(MOX::player[0].stardate_last_offered_hero == 35005);
+    DOCTEST_CHECK((MOX::leaders[3].xp == 0));
+    DOCTEST_CHECK((MOX::player[0].stardate_last_offered_hero == 35005));
     DOCTEST_CHECK(MOX::player[0].officer_for_hire == -1);
 }
 

@@ -111,7 +111,7 @@ DOCTEST_TEST_CASE("player initialization assigns the configured signed-safe trea
 
         INITGAME::Init_Players();
 
-        DOCTEST_CHECK(MOX::player[0].bc == (int32_t)starting_money);
+        DOCTEST_CHECK((MOX::player[0].bc == (int32_t)starting_money));
     }
 
     INITGAME::start = saved;
@@ -137,7 +137,7 @@ DOCTEST_TEST_CASE("player initialization resolves tech-level starting money") {
 
         INITGAME::Init_Players();
 
-        DOCTEST_CHECK(MOX::player[0].bc == money[level]);
+        DOCTEST_CHECK((MOX::player[0].bc == money[level]));
     }
 
     INITGAME::tech_start[STARTING_CIVILIZATION_LEVEL_AVERAGE].money = -1;
@@ -155,7 +155,7 @@ DOCTEST_TEST_CASE("player initialization resolves tech-level starting money") {
 
         INITGAME::Init_Players();
 
-        DOCTEST_CHECK(MOX::player[0].bc == 37);
+        DOCTEST_CHECK((MOX::player[0].bc == 37));
     }
 
     INITGAME::start = saved_start;

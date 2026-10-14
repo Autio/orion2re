@@ -182,15 +182,15 @@ DOCTEST_TEST_CASE("planet trimming preserves generated Orion and compacted refer
     DOCTEST_CHECK(MOX::planet[0].star_index == 0);
     DOCTEST_CHECK(MOX::planet[0].planet_special == SYSTEM_SPECIAL_ORION_STAR);
     DOCTEST_CHECK(MOX::star[0].system_special == SYSTEM_SPECIAL_ORION_STAR);
-    DOCTEST_CHECK(MOX::star[0].planet_index[1] == 0);
+    DOCTEST_CHECK((MOX::star[0].planet_index[1] == 0));
 
-    DOCTEST_CHECK(MOX::player[0].home_planet_id == 1);
+    DOCTEST_CHECK((MOX::player[0].home_planet_id == 1));
     DOCTEST_CHECK(MOX::colony[0].planet == 1);
-    DOCTEST_CHECK(MOX::star[2].planet_index[0] == 1);
-    DOCTEST_CHECK(MOX::star[2].planet_index[1] == 2);
-    DOCTEST_CHECK(MOX::star[3].planet_index[0] == 3);
-    DOCTEST_CHECK(MOX::star[1].planet_index[0] == -1);
-    DOCTEST_CHECK(MOX::star[1].planet_index[1] == 4);
+    DOCTEST_CHECK((MOX::star[2].planet_index[0] == 1));
+    DOCTEST_CHECK((MOX::star[2].planet_index[1] == 2));
+    DOCTEST_CHECK((MOX::star[3].planet_index[0] == 3));
+    DOCTEST_CHECK((MOX::star[1].planet_index[0] == -1));
+    DOCTEST_CHECK((MOX::star[1].planet_index[1] == 4));
     DOCTEST_CHECK(MOX::planet[4].planet_type == PLANET_TYPE_GAS_GIANT);
 }
 
@@ -210,10 +210,10 @@ DOCTEST_TEST_CASE("planet trimming does not protect star zero when Orion is disa
 
     DOCTEST_CHECK(MOX::planet_count == 1);
     DOCTEST_CHECK(MOX::planet[0].star_index == 1);
-    DOCTEST_CHECK(MOX::player[0].home_planet_id == 0);
+    DOCTEST_CHECK((MOX::player[0].home_planet_id == 0));
     DOCTEST_CHECK(MOX::colony[0].planet == 0);
-    DOCTEST_CHECK(MOX::star[0].planet_index[0] == -1);
-    DOCTEST_CHECK(MOX::star[1].planet_index[0] == 0);
+    DOCTEST_CHECK((MOX::star[0].planet_index[0] == -1));
+    DOCTEST_CHECK((MOX::star[1].planet_index[0] == 0));
 
     MAPGEN::special_generation_config.generate_orion = 1;
 }
@@ -503,7 +503,7 @@ DOCTEST_TEST_CASE(
 
     DOCTEST_CHECK(TEST_MAPGEN::Galaxy_Provider_Calls_() == 1);
     DOCTEST_CHECK(TEST_MAPGEN::Random_Calls_() == 1);
-    DOCTEST_CHECK(MOX::star[0].x == 77);
+    DOCTEST_CHECK((MOX::star[0].x == 77));
     DOCTEST_CHECK(MOX::planet[0].climate == PLANET_CLIMATE_GAIA);
 
     TEST_MAPGEN::Reset_();

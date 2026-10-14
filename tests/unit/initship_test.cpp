@@ -184,8 +184,8 @@ DOCTEST_TEST_CASE("tactical initialization fills all six persistent designs") {
 
     for (int16_t design_idx = 0; design_idx < SHIP_SIZE_COUNT; ++design_idx) {
         DOCTEST_CHECK(players[kPlayer].ship_designs[design_idx].size == design_idx);
-        DOCTEST_CHECK(players[kPlayer].ship_designs[design_idx].cost ==
-            100 + design_idx);
+        DOCTEST_CHECK((players[kPlayer].ship_designs[design_idx].cost ==
+            100 + design_idx));
     }
 }
 
@@ -431,7 +431,7 @@ DOCTEST_TEST_CASE("defensive Antaran loaders preserve configured weapons and spe
     MOX::settings.game_difficulty = GAME_DIFFICULTY_AVERAGE;
 
     INITSHIP::Load_Small_Antaran_Combat_Ship(0);
-    DOCTEST_CHECK(combat_data[0].weapons[1].weapon_id == 24);
+    DOCTEST_CHECK((combat_data[0].weapons[1].weapon_id == 24));
     DOCTEST_CHECK(combat_data[0].weapons[1].count == 1);
     DOCTEST_CHECK(combat_data[0].weapons[0].ammo == -1);
 
@@ -440,7 +440,7 @@ DOCTEST_TEST_CASE("defensive Antaran loaders preserve configured weapons and spe
     DOCTEST_CHECK(combat_data[0].weapons[4].count == 3);
 
     INITSHIP::Load_Titan_Antaran_Combat_Ship(0);
-    DOCTEST_CHECK(combat_data[0].weapons[7].weapon_id == 31);
+    DOCTEST_CHECK((combat_data[0].weapons[7].weapon_id == 31));
     DOCTEST_CHECK(combat_data[0].weapons[7].count == 6);
 
     s_ship_design& titan = SHIP_CONFIG::antaran_defensive_templates
@@ -452,9 +452,9 @@ DOCTEST_TEST_CASE("defensive Antaran loaders preserve configured weapons and spe
 
     INITSHIP::Load_Titan_Antaran_Combat_Ship(0);
     DOCTEST_CHECK(combat_data[0].special_device_flags[1] == 0x04);
-    DOCTEST_CHECK(combat_data[0].shield_arc_max == 37);
+    DOCTEST_CHECK((combat_data[0].shield_arc_max == 37));
     for (int i = 0; i < 4; ++i) {
-        DOCTEST_CHECK(combat_data[0].shield_arc_current[i] == 37);
+        DOCTEST_CHECK((combat_data[0].shield_arc_current[i] == 37));
     }
 
     titan.special_device_flags[1] = original_special;
@@ -547,9 +547,9 @@ DOCTEST_TEST_CASE("default defensive Harbinger loader preserves all tactical slo
         DOCTEST_CHECK(combat_data[0].weapons[6].weapon_id ==
             WEAPON_BLACK_HOLE_GENERATOR);
         DOCTEST_CHECK(combat_data[0].weapons[6].count == 1);
-        DOCTEST_CHECK(combat_data[0].weapons[7].weapon_id == WEAPON_INTERCEPTOR);
+        DOCTEST_CHECK((combat_data[0].weapons[7].weapon_id == WEAPON_INTERCEPTOR));
         DOCTEST_CHECK(combat_data[0].weapons[7].count == 6);
-        DOCTEST_CHECK(combat_data[0].weapons[7].ammo == 1);
+        DOCTEST_CHECK((combat_data[0].weapons[7].ammo == 1));
         if (difficulty == GAME_DIFFICULTY_TUTOR) {
             DOCTEST_CHECK(struct_::Test_Bit_Field(
                 combat_data[0].special_device_flags, SPECIAL_ECM_JAMMER));

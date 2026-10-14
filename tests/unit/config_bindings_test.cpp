@@ -6335,11 +6335,11 @@ DOCTEST_TEST_CASE("flyer hit points and planetary shields preserve classic defau
     DOCTEST_CHECK(CMBTMIS::flyer_hit_points.heavy_fighter == 10);
     DOCTEST_CHECK(TECHDATA::planetary_shields[PLANETARY_SHIELD_NONE].tech_app_id == 0);
     DOCTEST_CHECK(TECHDATA::planetary_shields[PLANETARY_SHIELD_NONE].absorption == 0);
-    DOCTEST_CHECK(TECHDATA::planetary_shields[PLANETARY_RADIATION_SHIELD].tech_app_id == 134);
+    DOCTEST_CHECK((TECHDATA::planetary_shields[PLANETARY_RADIATION_SHIELD].tech_app_id == 134));
     DOCTEST_CHECK(TECHDATA::planetary_shields[PLANETARY_RADIATION_SHIELD].absorption == 5);
     DOCTEST_CHECK(TECHDATA::planetary_shields[PLANETARY_FLUX_SHIELD].tech_app_id == 130);
     DOCTEST_CHECK(TECHDATA::planetary_shields[PLANETARY_FLUX_SHIELD].absorption == 10);
-    DOCTEST_CHECK(TECHDATA::planetary_shields[PLANETARY_BARRIER_SHIELD].tech_app_id == 129);
+    DOCTEST_CHECK((TECHDATA::planetary_shields[PLANETARY_BARRIER_SHIELD].tech_app_id == 129));
     DOCTEST_CHECK(TECHDATA::planetary_shields[PLANETARY_BARRIER_SHIELD].absorption == 20);
 
     config::s_config_write_set writes;
@@ -6362,11 +6362,11 @@ DOCTEST_TEST_CASE("flyer hit points and planetary shields preserve classic defau
     DOCTEST_CHECK(CMBTMIS::flyer_hit_points.heavy_fighter == 20);
     DOCTEST_CHECK(TECHDATA::planetary_shields[PLANETARY_SHIELD_NONE].tech_app_id == 0);
     DOCTEST_CHECK(TECHDATA::planetary_shields[PLANETARY_SHIELD_NONE].absorption == 0);
-    DOCTEST_CHECK(TECHDATA::planetary_shields[PLANETARY_RADIATION_SHIELD].tech_app_id == 513);
+    DOCTEST_CHECK((TECHDATA::planetary_shields[PLANETARY_RADIATION_SHIELD].tech_app_id == 513));
     DOCTEST_CHECK(TECHDATA::planetary_shields[PLANETARY_RADIATION_SHIELD].absorption == 6);
-    DOCTEST_CHECK(TECHDATA::planetary_shields[PLANETARY_FLUX_SHIELD].tech_app_id == 1027);
+    DOCTEST_CHECK((TECHDATA::planetary_shields[PLANETARY_FLUX_SHIELD].tech_app_id == 1027));
     DOCTEST_CHECK(TECHDATA::planetary_shields[PLANETARY_FLUX_SHIELD].absorption == 11);
-    DOCTEST_CHECK(TECHDATA::planetary_shields[PLANETARY_BARRIER_SHIELD].tech_app_id == 1541);
+    DOCTEST_CHECK((TECHDATA::planetary_shields[PLANETARY_BARRIER_SHIELD].tech_app_id == 1541));
     DOCTEST_CHECK(TECHDATA::planetary_shields[PLANETARY_BARRIER_SHIELD].absorption == 24);
 
     writes.writes.clear();
@@ -6758,7 +6758,7 @@ DOCTEST_TEST_CASE("rifle, troop, and tactical turn settings preserve 1.50 defaul
     DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
     DOCTEST_REQUIRE(config::Commit_State(&state));
 
-    DOCTEST_CHECK(TECHDATA::rifles[RIFLE_PLASMA_RIFLE].tech_app_id == TECH_APP_FUSION_RIFLE);
+    DOCTEST_CHECK((TECHDATA::rifles[RIFLE_PLASMA_RIFLE].tech_app_id == TECH_APP_FUSION_RIFLE));
     DOCTEST_CHECK(TECHDATA::rifles[RIFLE_PLASMA_RIFLE].bonus == 31);
     DOCTEST_CHECK(invasion::troop.type.tanks == 14);
     DOCTEST_CHECK(invasion::troop.type.militia == -8);
@@ -7407,7 +7407,7 @@ DOCTEST_TEST_SUITE("generated configuration bindings") {
     DOCTEST_TEST_CASE("predefined ship templates have native defaults before configuration") {
         DOCTEST_CHECK(SHIP_CONFIG::guardian_template.picture_num == 7);
         DOCTEST_CHECK(SHIP_CONFIG::guardian_template.ship_weapon[2].type == 20);
-        DOCTEST_CHECK(SHIP_CONFIG::guardian_template.ship_weapon[2].specials == 0x4500);
+        DOCTEST_CHECK((SHIP_CONFIG::guardian_template.ship_weapon[2].specials == 0x4500));
         DOCTEST_CHECK(SHIP_CONFIG::guardian_template.ship_weapon[2].count == 1);
         DOCTEST_CHECK(SHIP_CONFIG::guardian_template.ship_weapon[2].current_count == 1);
         DOCTEST_CHECK((SHIP_CONFIG::guardian_template.special_device_flags[3] & 0x02) != 0);
@@ -7567,9 +7567,9 @@ DOCTEST_TEST_SUITE("generated configuration bindings") {
                               sizeof(design.special_device_flags)) == 0);
             for (int slot = 0; slot < 8; ++slot) {
                 const s_ship_weapons& weapon = design.ship_weapon[slot];
-                DOCTEST_CHECK(weapon.type == expected[slot].type);
+                DOCTEST_CHECK((weapon.type == expected[slot].type));
                 DOCTEST_CHECK(weapon.firing_arc == expected[slot].arc);
-                DOCTEST_CHECK(weapon.specials == expected[slot].mods);
+                DOCTEST_CHECK((weapon.specials == expected[slot].mods));
                 DOCTEST_CHECK(weapon.ammo == expected[slot].ammo);
                 DOCTEST_CHECK(weapon.count == expected[slot].amount);
                 DOCTEST_CHECK(weapon.current_count == expected[slot].amount);
@@ -7619,9 +7619,9 @@ DOCTEST_TEST_SUITE("generated configuration bindings") {
                               sizeof(design.special_device_flags)) == 0);
             for (int slot = 0; slot < 8; ++slot) {
                 const s_ship_weapons& weapon = design.ship_weapon[slot];
-                DOCTEST_CHECK(weapon.type == expected[slot].type);
+                DOCTEST_CHECK((weapon.type == expected[slot].type));
                 DOCTEST_CHECK(weapon.firing_arc == expected[slot].arc);
-                DOCTEST_CHECK(weapon.specials == expected[slot].mods);
+                DOCTEST_CHECK((weapon.specials == expected[slot].mods));
                 DOCTEST_CHECK(weapon.ammo == expected[slot].ammo);
                 DOCTEST_CHECK(weapon.count == expected[slot].amount);
                 DOCTEST_CHECK(weapon.current_count == expected[slot].amount);
@@ -7958,10 +7958,10 @@ DOCTEST_TEST_SUITE("generated configuration bindings") {
         DOCTEST_CHECK(SHIP_CONFIG::hydra_templates[0].ship_weapon[0].count == 3);
         DOCTEST_CHECK(SHIP_CONFIG::dragon_templates[0].computer_type ==
             COMPUTER_MOLECULARTRONIC_COMPUTER);
-        DOCTEST_CHECK(SHIP_CONFIG::dragon_templates[0].ship_weapon[0].specials ==
-            WEAPON_MOD_FLAG_POINT_DEFENSE);
-        DOCTEST_CHECK(SHIP_CONFIG::dragon_templates[1].ship_weapon[1].specials ==
-            WEAPON_MOD_FLAG_OVERLOADED);
+        DOCTEST_CHECK((SHIP_CONFIG::dragon_templates[0].ship_weapon[0].specials ==
+            WEAPON_MOD_FLAG_POINT_DEFENSE));
+        DOCTEST_CHECK((SHIP_CONFIG::dragon_templates[1].ship_weapon[1].specials ==
+            WEAPON_MOD_FLAG_OVERLOADED));
         DOCTEST_CHECK(SHIP_CONFIG::guardian_template.computer_type ==
             COMPUTER_MOLECULARTRONIC_COMPUTER);
 
@@ -7981,20 +7981,20 @@ DOCTEST_TEST_SUITE("generated configuration bindings") {
         DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
         DOCTEST_REQUIRE(config::Commit_State(&state));
 
-        DOCTEST_CHECK(SHIP_CONFIG::hydra_templates[0].ship_weapon[0].specials ==
-            WEAPON_MOD_FLAG_HEAVY_MOUNT);
+        DOCTEST_CHECK((SHIP_CONFIG::hydra_templates[0].ship_weapon[0].specials ==
+            WEAPON_MOD_FLAG_HEAVY_MOUNT));
         DOCTEST_CHECK(SHIP_CONFIG::dragon_templates[0].shield_type ==
             SHIELD_CLASS_I_SHIELD);
         DOCTEST_CHECK(SHIP_CONFIG::dragon_templates[0].computer_type ==
             COMPUTER_ELECTRONIC_COMPUTER);
-        DOCTEST_CHECK(SHIP_CONFIG::dragon_templates[0].ship_weapon[1].specials ==
-            WEAPON_MOD_FLAG_HEAVY_MOUNT);
+        DOCTEST_CHECK((SHIP_CONFIG::dragon_templates[0].ship_weapon[1].specials ==
+            WEAPON_MOD_FLAG_HEAVY_MOUNT));
         DOCTEST_CHECK(SHIP_CONFIG::dragon_templates[1].shield_type ==
             SHIELD_CLASS_III_SHIELD);
         DOCTEST_CHECK(SHIP_CONFIG::dragon_templates[1].computer_type ==
             COMPUTER_OPTRONIC_COMPUTER);
-        DOCTEST_CHECK(SHIP_CONFIG::dragon_templates[1].ship_weapon[2].type ==
-            WEAPON_PLASMA_BREATH);
+        DOCTEST_CHECK((SHIP_CONFIG::dragon_templates[1].ship_weapon[2].type ==
+            WEAPON_PLASMA_BREATH));
         DOCTEST_CHECK(SHIP_CONFIG::dragon_templates[1].ship_weapon[2].count == 2);
         DOCTEST_CHECK(SHIP_CONFIG::dragon_templates[1].ship_weapon[2].current_count == 2);
         DOCTEST_CHECK(SHIP_CONFIG::guardian_template.ship_weapon[0].count == 99);
