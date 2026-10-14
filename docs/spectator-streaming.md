@@ -21,6 +21,23 @@ marked as illustrative. It is not a simulation and playback controls are disable
 Build the engine using the repository instructions. Original MOO2 game data is
 required and is not included in this fork. Keep it outside the repository.
 
+On Windows, the launcher prepares a separate runtime beside the repository,
+copies the original LBX/SMK assets and built engine, supplies `ORIONCD.INI`, and
+starts the game plus the live dashboard on port 8766:
+
+```powershell
+.\tools\stream\start.ps1 -GameDataDirectory 'C:\Games\Master of Orion 2'
+```
+
+Select the folder containing `FONTS.LBX` and the other LBX files. The launcher
+expects the build under `out/build/stream`, preserves an existing runtime config,
+and keeps test saves separate from the original installation. Close the test
+game before running the launcher again. `-PrepareOnly` prepares files without
+starting either process; `-RuntimeDirectory`, `-GameExecutable`, and `-Port`
+override their defaults. The server process ID is printed for later shutdown.
+
+For manual setup or other platforms:
+
 Create a broadcast directory and start the companion server:
 
 ```powershell
@@ -37,7 +54,7 @@ $env:ORION2RE_STREAM_CONTROL = (Join-Path (Get-Location) 'out/stream/control.txt
 ```
 
 Start or load a **single-player** game. On the galaxy screen, use the existing
-`ALLAI` cheat sequence to hand the human empire to the AI. This starts a new
+`ALLAI` cheat sequence (hold Alt while typing ALLAI) to hand the human empire to the AI. This starts a new
 journal session. The conversion uses the engine's existing AI setup, including
 replacing colony queues. Use a dedicated spectator save.
 
@@ -123,4 +140,11 @@ tests, and JavaScript syntax validation passed. The browser preview was checked
 for rendering, empire selection, evidence display, and the transparent overlay
 route. The `test_diplomac` and `test_npcdiplo` targets failed to link unresolved
 game-runtime symbols in their fake runtimes, so those suites have not passed.
-Trying `test_diplomac` in Release also failed. No live match has been tested yet.
+Trying `test_diplomac` in Release also failed.
+
+The first original-data integration test successfully reached the main menu,
+initialized a five-empire single-player ALLAI game, and delivered live snapshots
+to the dashboard. Autoplay advanced turns; a pause check held stardate 35013
+across repeated reads and resume continued the game. The launcher passed parsing,
+runtime-preparation, and existing-config preservation checks. A complete match,
+combat interruption behavior, and elimination handling remain unverified.
