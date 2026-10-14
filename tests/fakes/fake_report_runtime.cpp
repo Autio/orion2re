@@ -26,6 +26,7 @@ namespace TEST_REPORT {
         memset(leaders, 0, sizeof(leaders));
         memset(REPORT::done_colonize_check, 0, sizeof(REPORT::done_colonize_check));
         memset(&MOX::settings, 0, sizeof(MOX::settings));
+        memset(MSG_::msgs, 0, sizeof(MSG_::msgs));
 
         MOX::NUM_STARS = 1;
         MOX::NUM_SHIPS = 1;
@@ -59,10 +60,25 @@ namespace TEST_REPORT {
     }
 }
 
+namespace MSG_ {
+    s_MSG msgs[MAX_MESSAGES];
+    uint8_t first_msg[MAX_PLAYERS];
+    uint8_t n_msgs[MAX_PLAYERS];
+
+    int16_t __cdecl N_Msgs_For_Player(int16_t player_idx) {
+        return n_msgs[player_idx];
+    }
+
+    int16_t __cdecl First_Msg_For_Player(int16_t player_idx) {
+        return first_msg[player_idx];
+    }
+}
+
 namespace MOX {
     int16_t NUM_COLONIES;
     int16_t NUM_STARS;
     int16_t NUM_SHIPS;
+    int16_t PLAYER_NUM;
     int32_t stardate;
     int16_t current_screen;
     int16_t return_screen;

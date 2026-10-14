@@ -4194,6 +4194,18 @@
       },
     },
 
+    sort_serious_turn_summary_first: {
+      title: "Serious turn-summary messages first",
+      description: "Displays serious Turn Summary messages before other messages, preserving their order within each group.",
+      remarks: "False preserves the original message order. This does not change which messages trigger a Turn Summary or hide any messages.",
+      examples: ["interface sort_serious_turn_summary_first = true;"],
+      group: "interface",
+      namespace: "interface",
+      type: "bool",
+      default: false,
+      bind_root: { header: "game/report.h", symbol: "REPORT::sort_serious_turn_summary_first" },
+    },
+
     wormhole_link_color: {
       title: "Wormhole link color",
       description: "Sets the palette index used to draw links between paired wormholes on the galaxy map.",

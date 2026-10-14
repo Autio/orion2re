@@ -125,6 +125,62 @@ DOCTEST_TEST_CASE("skipping outpost prompt suppresses unusable colony prompt") {
     DOCTEST_CHECK(REPORT::Colonization(0, 0) == 0);
 }
 
+DOCTEST_TEST_CASE("serious-first summary order preserves queue order within each group") {
+    TEST_REPORT::Reset_();
+    MSG_::msgs[5].msg_type = MSG_TYPE_COLONY;
+    MSG_::msgs[5].u.colony.subtype = MSG_COLONY_SUBTYPE_PRODUCTION_COMPLETED;
+    MSG_::msgs[6].msg_type = MSG_TYPE_LOST_ATTACKING_SPY;
+    MSG_::msgs[7].msg_type = MSG_TYPE_COLONY;
+    MSG_::msgs[7].u.colony.subtype = MSG_COLONY_SUBTYPE_REBELLION;
+    MSG_::msgs[8].msg_type = MSG_TYPE_HYPERSPACE_FLUX;
+    MSG_::msgs[9].msg_type = MSG_TYPE_LOST_DEFENDING_SPY;
+
+    uint8_t order[5] = {};
+    REPORT::Order_Turn_Summary_Messages(order, 5, 5, false);
+    const uint8_t original[] = {5, 6, 7, 8, 9};
+    for (int i = 0; i < 5; ++i) DOCTEST_CHECK(order[i] == original[i]);
+
+    REPORT::Order_Turn_Summary_Messages(order, 5, 5, true);
+    const uint8_t sorted[] = {6, 7, 9, 5, 8};
+    for (int i = 0; i < 5; ++i) DOCTEST_CHECK(order[i] == sorted[i]);
+}
+
+DOCTEST_TEST_CASE("summary sorting uses serious-only trigger classification") {
+    TEST_REPORT::Reset_();
+    s_MSG msg = {};
+    msg.msg_type = MSG_TYPE_COLONY;
+    msg.u.colony.subtype = MSG_COLONY_SUBTYPE_STARVATION;
+    DOCTEST_CHECK(REPORT::Is_Serious_Msg(msg));
+    msg.u.colony.subtype = MSG_COLONY_SUBTYPE_PLAGUE;
+    DOCTEST_CHECK_FALSE(REPORT::Is_Serious_Msg(msg));
+    msg.msg_type = MSG_TYPE_HYPERSPACE_BEAST;
+    msg.u.hyperspace_beast.ship_idx = -1;
+    DOCTEST_CHECK_FALSE(REPORT::Is_Serious_Msg(msg));
+    msg.u.hyperspace_beast.ship_idx = 1;
+    msg.u.hyperspace_beast.fate = 1;
+    DOCTEST_CHECK(REPORT::Is_Serious_Msg(msg));
+}
+
+DOCTEST_TEST_CASE("summary sorting config does not change serious-only triggers") {
+    TEST_REPORT::Reset_();
+    MSG_::first_msg[0] = 0;
+    MSG_::n_msgs[0] = 1;
+    MSG_::msgs[0].msg_type = MSG_TYPE_COLONY;
+    MSG_::msgs[0].u.colony.subtype = MSG_COLONY_SUBTYPE_PRODUCTION_COMPLETED;
+    MOX::settings.end_of_turn_summary = 1;
+    MOX::settings.only_show_serious_turn_summary_reports = 1;
+    REPORT::sort_serious_turn_summary_first = true;
+    REPORT::displayed_msgs = 0;
+    DOCTEST_CHECK(REPORT::Has_Msg(0, 0) == 0);
+
+    MSG_::msgs[0].msg_type = MSG_TYPE_LOST_ATTACKING_SPY;
+    DOCTEST_CHECK(REPORT::Has_Msg(0, 0) == 4);
+    MSG_::msgs[0].msg_type = MSG_TYPE_COLONY;
+    MSG_::msgs[0].u.colony.subtype = MSG_COLONY_SUBTYPE_REBELLION;
+    DOCTEST_CHECK(REPORT::Has_Msg(0, 0) == 4);
+    REPORT::sort_serious_turn_summary_first = false;
+}
+
 DOCTEST_TEST_CASE("filtered colony prompt retains its ship for assignment cleanup") {
     TEST_REPORT::Reset_();
     TEST_REPORT::Add_Colony_Ship_();
